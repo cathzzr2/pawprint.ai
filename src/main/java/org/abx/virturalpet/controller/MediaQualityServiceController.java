@@ -19,12 +19,30 @@ public class MediaQualityServiceController {
     public ResponseEntity<ImprovePhotoDto> improvePhoto(@RequestBody ImprovePhotoDto improvePhotoDto) {
         String photoFile = improvePhotoDto.getPhotoFile();
         ImprovePhotoDto res = mediaQualityService.improvePhoto(photoFile);
-        return ResponseEntity.ok(res);
+
+        if (res == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(ImprovePhotoDto.builder()
+                .statusCode(res.getStatusCode())
+                .statusMsg(res.getStatusMsg())
+                .improvedPhotoId(res.getImprovedPhotoId())
+                .build());
     }
 
     @RequestMapping(value = "/results/{improvedPhotoId}", method = RequestMethod.GET)
     public ResponseEntity<ImprovePhotoDto> getImprovedPhoto(@PathVariable String improvedPhotoId) {
         ImprovePhotoDto res = mediaQualityService.getImprovedPhoto(improvedPhotoId);
-        return ResponseEntity.ok(res);
+
+        if (res == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(ImprovePhotoDto.builder()
+                .statusCode(res.getStatusCode())
+                .statusMsg(res.getStatusMsg())
+                .improvedPhotoUrl(res.getImprovedPhotoUrl())
+                .build());
     }
 }

@@ -29,7 +29,10 @@ public interface ImprovePhotoDto {
     }
 
     @JsonProperty("photo_file")
-    String getPhotoFile();
+    @Value.Default
+    default String getPhotoFile() {
+        return "";
+    }
 
     @JsonProperty("improved_photo_url")
     @Value.Default

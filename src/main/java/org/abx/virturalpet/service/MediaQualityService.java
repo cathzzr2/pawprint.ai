@@ -9,14 +9,15 @@ import org.springframework.stereotype.Service;
 public class MediaQualityService {
     private static final String MEDIA_NOT_FOUND = "media not found";
     private static final String MEDIA_NOT_PROVIDED = "media not provided";
-    private static final String SUCCESS = "media improved";
+    private static final String IMPROVE_SUCCESS = "Media improved successfully";
+
+    private static final String GET_URL_SUCCESS = "Successfully retrieved media URL";
 
     public ImprovePhotoDto improvePhoto(String photoFile) {
         if (photoFile == null || photoFile.isEmpty()) {
             return ImmutableImprovePhotoDto.builder()
                     .statusCode(1)
                     .statusMsg(MEDIA_NOT_PROVIDED)
-                    .photoFile("")
                     .improvedPhotoId(null)
                     .build();
         }
@@ -25,8 +26,7 @@ public class MediaQualityService {
 
         return ImmutableImprovePhotoDto.builder()
                 .statusCode(0)
-                .statusMsg(SUCCESS)
-                .photoFile(photoFile)
+                .statusMsg(IMPROVE_SUCCESS)
                 .improvedPhotoId(improvedPhotoId)
                 .build();
     }
@@ -36,17 +36,13 @@ public class MediaQualityService {
             return ImmutableImprovePhotoDto.builder()
                     .statusCode(1)
                     .statusMsg(MEDIA_NOT_FOUND)
-                    .photoFile("")
-                    .improvedPhotoId(null)
                     .build();
         }
 
         String improvedPhotoUrl = "http://example.com/path/to/photo/" + improvedPhotoId + ".jpg";
         return ImmutableImprovePhotoDto.builder()
                 .statusCode(0)
-                .statusMsg(SUCCESS)
-                .photoFile("")
-                .improvedPhotoId(improvedPhotoId)
+                .statusMsg(GET_URL_SUCCESS)
                 .improvedPhotoUrl(improvedPhotoUrl)
                 .build();
     }
