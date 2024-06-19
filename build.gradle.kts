@@ -24,11 +24,11 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.diffplug.spotless:spotless-plugin-gradle:6.18.0")
-//    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
     annotationProcessor("org.immutables:value:2.9.3")
     compileOnly("org.immutables:value:2.9.3")
-//    runtimeOnly("org.postgresql:postgresql")
+    runtimeOnly("org.postgresql:postgresql")
 
     // test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
