@@ -1,13 +1,12 @@
 package org.abx.virturalpet.controller;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import org.abx.virturalpet.dto.ImmutablePetServiceDto;
 import org.abx.virturalpet.dto.PetServiceDto;
 import org.abx.virturalpet.service.PetService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
-import java.net.URISyntaxException;
 
 @RestController
 public class PetServiceController {
@@ -17,9 +16,13 @@ public class PetServiceController {
         this.petService = petService;
     }
 
-    @RequestMapping(value = "/pets/{petId}", method = RequestMethod.GET)
-    public ResponseEntity<PetServiceDto> getPetDocument(@PathVariable("petId") Integer petId) {
+    @RequestMapping(value = "/pets/{pet_id}", method = RequestMethod.GET)
+    public ResponseEntity<PetServiceDto> getPetDocument(@PathVariable("pet_id") int petId) {
         PetServiceDto petServiceDto = petService.searchPetByID(petId);
+
+        if (petServiceDto == null) {
+            return ResponseEntity.notFound().build();
+        }
 
         return ResponseEntity.ok(PetServiceDto.builder()
                 .petId(petServiceDto.getPetId())
@@ -29,9 +32,9 @@ public class PetServiceController {
                 .build());
     }
 
-    @RequestMapping(value = "/pets/{petId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/pets/{pet_id}", method = RequestMethod.PUT)
     public ResponseEntity<PetServiceDto> updatePetDocument(
-            @PathVariable("petId") Integer petId, @RequestBody ImmutablePetServiceDto petServiceDto) {
+            @PathVariable("pet_id") int petId, @RequestBody ImmutablePetServiceDto petServiceDto) {
         PetServiceDto updatedPet = petService.updatePet(petId, petServiceDto);
 
         if (updatedPet == null) {
@@ -45,8 +48,8 @@ public class PetServiceController {
                 .build());
     }
 
-    @RequestMapping(value = "/pets/{petId}", method = RequestMethod.DELETE)
-    public ResponseEntity<PetServiceDto> deletePetDocument(@PathVariable("petId") Integer petId) {
+    @RequestMapping(value = "/pets/{pet_id}", method = RequestMethod.DELETE)
+    public ResponseEntity<PetServiceDto> deletePetDocument(@PathVariable("pet_id") Integer petId) {
 
         if (petService.deletePetByID(petId)) {
             return ResponseEntity.noContent().build();
@@ -57,7 +60,10 @@ public class PetServiceController {
     @RequestMapping(value = "/pets", method = RequestMethod.POST)
     public ResponseEntity<PetServiceDto> createPetDocument(@RequestBody PetServiceDto petServiceDto)
             throws URISyntaxException {
-        PetServiceDto pet = petService.createPet((ImmutablePetServiceDto) petServiceDto);
-        return ResponseEntity.created(new URI("/pets" + pet.getPetId())).build();
+        PetServiceDto pet = petService.createPet(petServiceDto);
+        if (pet == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.created(new URI("/pets/" + pet.getPetId())).body(pet);
     }
 }

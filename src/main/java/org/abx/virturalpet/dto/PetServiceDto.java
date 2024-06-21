@@ -1,4 +1,5 @@
 package org.abx.virturalpet.dto;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -10,17 +11,20 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutablePetServiceDto.class)
 public interface PetServiceDto extends Serializable {
 
+    @Value.Default
     @JsonProperty("pet_id")
-    int getPetId();
+    default int getPetId() {
+        return 0;
+    }
 
     @JsonProperty("pet_name")
     String getPetName();
 
-    @JsonProperty("petType")
+    @JsonProperty("pet_type")
     String getPetType();
 
-    @JsonProperty("petAge")
-    String getPetAge();
+    @JsonProperty("pet_age")
+    int getPetAge();
 
     static ImmutablePetServiceDto.Builder builder() {
         return ImmutablePetServiceDto.builder();
