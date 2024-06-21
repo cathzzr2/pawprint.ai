@@ -1,7 +1,5 @@
 package org.abx.virturalpet.controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import org.abx.virturalpet.dto.ImmutablePetServiceDto;
@@ -77,7 +75,8 @@ public class PetServiceControllerTest {
                 .petAge(3)
                 .build();
 
-        when(petService.updatePet(eq(1), any())).thenReturn(mockedPetServiceDto);
+        when(petService.updatePet(org.mockito.ArgumentMatchers.eq(1), org.mockito.ArgumentMatchers.any()))
+                .thenReturn(mockedPetServiceDto);
 
         String requestJsonPayload = "{\n"
                 + "\"pet_id\": 1,\n"
@@ -155,7 +154,7 @@ public class PetServiceControllerTest {
                 .petAge(3)
                 .build();
 
-        when(petService.createPet(any())).thenReturn(mockedPetServiceDto);
+        when(petService.createPet(org.mockito.ArgumentMatchers.any())).thenReturn(mockedPetServiceDto);
 
         String requestJsonPayload = "{\n"
                 + "\"pet_id\": 1,\n"
@@ -178,7 +177,7 @@ public class PetServiceControllerTest {
     @Test
     public void testCreatePetDocument_returnBadRequest() throws Exception {
 
-        when(petService.createPet(any())).thenReturn(null);
+        when(petService.createPet(org.mockito.ArgumentMatchers.any())).thenReturn(null);
 
         String requestJsonPayload = "{\n"
                 + "\"pet_id\": 1,\n"
