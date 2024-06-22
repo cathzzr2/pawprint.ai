@@ -16,21 +16,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class MediaQualityServiceController {
     private static final Logger logger = LoggerFactory.getLogger(MediaQualityServiceController.class);
+
     @Autowired
     private MediaQualityService mediaQualityService;
 
     @RequestMapping(value = "/improve", method = RequestMethod.POST)
     public ResponseEntity<ImprovePhotoJbDto> improvePhotoJbID(@RequestBody ImprovePhotoJbDto improvePhotoJbDto) {
-        logger.info("Received request to improve photo with ID: {}", improvePhotoJbDto.getImprovePhotoJbId());
         String photoFile = improvePhotoJbDto.getPhotoFile();
         ImprovePhotoJbDto res = mediaQualityService.enqueuePhoto(photoFile);
-
         if (res == null) {
             logger.warn("No improvement found for photo with ID: {}", improvePhotoJbDto.getImprovePhotoJbId());
             return ResponseEntity.notFound().build();
         }
-
-        logger.info("Successfully improved photo with ID: {}", res.getImprovePhotoJbId());
         return ResponseEntity.ok(ImprovePhotoJbDto.builder()
                 .improvePhotoJbId(res.getImprovePhotoJbId())
                 .photoFile(res.getPhotoFile())

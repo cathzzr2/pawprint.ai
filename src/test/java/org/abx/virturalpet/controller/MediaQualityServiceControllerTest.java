@@ -1,11 +1,11 @@
 package org.abx.virturalpet.controller;
 
+import static org.mockito.Mockito.when;
+
 import org.abx.virturalpet.dto.ImprovePhotoJbDto;
 import org.abx.virturalpet.dto.ImprovedPhotoResultDto;
 import org.abx.virturalpet.service.MediaQualityService;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -14,11 +14,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import static org.mockito.Mockito.when;
-
 @WebMvcTest(MediaQualityServiceController.class)
 public class MediaQualityServiceControllerTest {
-    private static final Logger logger = LoggerFactory.getLogger(MediaQualityServiceControllerTest.class);
     @Autowired
     private MockMvc mockMvc;
 
@@ -36,19 +33,16 @@ public class MediaQualityServiceControllerTest {
 
         String requestJsonPayload = "{\n"
                 + "\"queue_jb_id\": \"ff7fbf43-c053-4c8d-9957-0db0c4e36c72\",\n"
-                + "\"photoFile\": \"base64_encoded_photo\"\n"
+                + "\"photo_file\": \"base64_encoded_photo\"\n"
                 + "}";
-
-        logger.info("Request Body: {}", requestJsonPayload);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/improve")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJsonPayload))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.improvePhotoJbId").value("ff7fbf43-c053-4c8d-9957-0db0c4e36c72"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.photoFile").value("base64_encoded_photo"));
-
-        logger.info("Mocked Response: {}", mockedResponse);
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.queue_jb_id").value("ff7fbf43-c053-4c8d-9957-0db0c4e36c72"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.photo_file").value("base64_encoded_photo"));
     }
 
     @Test
