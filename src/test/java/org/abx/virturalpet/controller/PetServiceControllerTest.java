@@ -4,6 +4,7 @@ import static org.mockito.Mockito.when;
 
 import org.abx.virturalpet.dto.ImmutablePetServiceDto;
 import org.abx.virturalpet.dto.PetServiceDto;
+import org.abx.virturalpet.dto.PetTypeEnum;
 import org.abx.virturalpet.service.PetService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ public class PetServiceControllerTest {
         PetServiceDto mockedPetServiceDto = PetServiceDto.builder()
                 .petId(1)
                 .petName("Alice")
-                .petType("Cat")
+                .petType(PetTypeEnum.CAT)
                 .petAge(3)
                 .build();
 
@@ -37,7 +38,7 @@ public class PetServiceControllerTest {
         String requestJsonPayload = "{\n"
                 + "\"pet_id\": 1,\n"
                 + "\"pet_name\": \"Alice\",\n"
-                + "\"pet_type\": \"Cat\",\n"
+                + "\"pet_type\": \"CAT\",\n"
                 + "\"pet_age\": 3\n"
                 + "}";
 
@@ -47,7 +48,7 @@ public class PetServiceControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pet_id").value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pet_name").value("Alice"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.pet_type").value("Cat"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.pet_type").value("CAT"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pet_age").value(3));
     }
 
@@ -56,7 +57,7 @@ public class PetServiceControllerTest {
         String requestJsonPayload = "{\n"
                 + "\"pet_id\": 1,\n"
                 + "\"pet_name\": \"Alice\",\n"
-                + "\"pet_type\": \"Cat\",\n"
+                + "\"pet_type\": \"CAT\",\n"
                 + "\"pet_age\": 3\n"
                 + "}";
 
@@ -71,7 +72,7 @@ public class PetServiceControllerTest {
         ImmutablePetServiceDto mockedPetServiceDto = PetServiceDto.builder()
                 .petId(1)
                 .petName("Alice")
-                .petType("Cat")
+                .petType(PetTypeEnum.CAT)
                 .petAge(3)
                 .build();
 
@@ -81,7 +82,7 @@ public class PetServiceControllerTest {
         String requestJsonPayload = "{\n"
                 + "\"pet_id\": 1,\n"
                 + "\"pet_name\": \"Alice\",\n"
-                + "\"pet_type\": \"Cat\",\n"
+                + "\"pet_type\": \"CAT\",\n"
                 + "\"pet_age\": 3\n"
                 + "}";
 
@@ -91,7 +92,7 @@ public class PetServiceControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pet_id").value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pet_name").value("Alice"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.pet_type").value("Cat"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.pet_type").value("CAT"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pet_age").value(3));
     }
 
@@ -101,7 +102,7 @@ public class PetServiceControllerTest {
         String requestJsonPayload = "{\n"
                 + "\"pet_id\": 1,\n"
                 + "\"pet_name\": \"Alice\",\n"
-                + "\"pet_type\": \"Cat\",\n"
+                + "\"pet_type\": \"CAT\",\n"
                 + "\"pet_age\": 3\n"
                 + "}";
 
@@ -116,7 +117,7 @@ public class PetServiceControllerTest {
         PetServiceDto mockedPetServiceDto = PetServiceDto.builder()
                 .petId(1)
                 .petName("Alice")
-                .petType("Cat")
+                .petType(PetTypeEnum.CAT)
                 .petAge(3)
                 .build();
 
@@ -133,7 +134,7 @@ public class PetServiceControllerTest {
         PetServiceDto mockedPetServiceDto = PetServiceDto.builder()
                 .petId(1)
                 .petName("Alice")
-                .petType("Cat")
+                .petType(PetTypeEnum.CAT)
                 .petAge(3)
                 .build();
 
@@ -150,7 +151,7 @@ public class PetServiceControllerTest {
         PetServiceDto mockedPetServiceDto = PetServiceDto.builder()
                 .petId(1)
                 .petName("Alice")
-                .petType("Cat")
+                .petType(PetTypeEnum.CAT)
                 .petAge(3)
                 .build();
 
@@ -159,7 +160,7 @@ public class PetServiceControllerTest {
         String requestJsonPayload = "{\n"
                 + "\"pet_id\": 1,\n"
                 + "\"pet_name\": \"Alice\",\n"
-                + "\"pet_type\": \"Cat\",\n"
+                + "\"pet_type\": \"CAT\",\n"
                 + "\"pet_age\": 3\n"
                 + "}";
 
@@ -169,7 +170,7 @@ public class PetServiceControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pet_id").value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pet_name").value("Alice"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.pet_type").value("Cat"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.pet_type").value("CAT"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pet_age").value(3))
                 .andExpect(MockMvcResultMatchers.header().string("Location", "/pets/1"));
     }
@@ -182,7 +183,7 @@ public class PetServiceControllerTest {
         String requestJsonPayload = "{\n"
                 + "\"pet_id\": 1,\n"
                 + "\"pet_name\": \"Alice\",\n"
-                + "\"pet_type\": \"Cat\",\n"
+                + "\"pet_type\": \"CAT\",\n"
                 + "\"pet_age\": 3\n"
                 + "}";
 

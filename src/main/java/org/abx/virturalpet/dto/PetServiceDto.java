@@ -21,7 +21,7 @@ public interface PetServiceDto extends Serializable {
     String getPetName();
 
     @JsonProperty("pet_type")
-    String getPetType();
+    PetTypeEnum getPetType();
 
     @JsonProperty("pet_age")
     int getPetAge();
