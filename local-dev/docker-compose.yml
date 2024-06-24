@@ -15,6 +15,19 @@ services:
     networks:
       - backend
 
+  # MongoDB set up
+  virtual-pet-mongodb:
+      image: mongo:latest
+      ports:
+      - "27017:27017"
+      volumes:
+        - ./mongoScripts:/docker-entrypoint-initdb.d
+      environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=password
+      - MONGO_INITDB_DATABASE=virtual_pet_db
+      networks:
+        - backend
 
   # kafak & zookeeper
   zoo1:
