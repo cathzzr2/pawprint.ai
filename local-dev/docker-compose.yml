@@ -1,4 +1,3 @@
-version: "3"
 services:
   # postgres set up
   virtual-pet-postgres:
@@ -12,6 +11,22 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=virtual_pet_db
       - PGDATA=/var/lib/postgresql/data/db
+    networks:
+      - backend
+
+  virtual-pet-localstack:
+    image: localstack/localstack:latest
+    environment:
+      - AWS_DEFAULT_REGION=us-east-1
+      - EDGE_PORT=4566
+      - SERVICES=s3
+      - DEBUG=1
+    ports:
+      - "4549-4566:4549-4566"
+    volumes:
+      - ./aws:/etc/localstack/init/ready.d/  # ready hook
+      - localstack_data:/var/lib/localstack
+      - "/var/run/docker.sock:/var/run/docker.sock"
     networks:
       - backend
 
