@@ -1,4 +1,3 @@
-version: "3"
 services:
   # postgres set up
   virtual-pet-postgres:
