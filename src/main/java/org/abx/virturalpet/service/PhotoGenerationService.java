@@ -1,8 +1,8 @@
 package org.abx.virturalpet.service;
 
 import java.util.UUID;
-import org.abx.virturalpet.dto.PhotoGenerationDto;
 import org.abx.virturalpet.dto.ImmutablePhotoGenerationDto;
+import org.abx.virturalpet.dto.PhotoGenerationDto;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -29,19 +29,15 @@ public class PhotoGenerationService {
 
         boolean ifComplete = true;
 
-        return ImmutablePhotoGenerationDto.builder()
-                .completed(ifComplete)
-                .build();
+        return ImmutablePhotoGenerationDto.builder().completed(ifComplete).build();
     }
 
-    public  PhotoGenerationDto getGenImg(String imageId) {
+    public PhotoGenerationDto getGenImg(String imageId) {
         if (imageId == null || imageId.isEmpty()) {
             return null;
         }
 
         String genPhoto = "base64_encoded_photo";
-        return ImmutablePhotoGenerationDto.builder()
-                .imageData(genPhoto)
-                .build();
+        return ImmutablePhotoGenerationDto.builder().imageData(genPhoto).build();
     }
 }

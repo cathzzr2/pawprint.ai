@@ -1,9 +1,9 @@
 package org.abx.virturalpet.dto;
 
-import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.io.Serializable;
 import org.immutables.value.Value;
 
 @Value.Immutable
@@ -30,7 +30,7 @@ public interface PhotoGenerationDto extends Serializable {
 
     @JsonProperty("completed")
     @Value.Default
-    default boolean getCompleted(){
+    default boolean getCompleted() {
         return false;
     }
 
@@ -38,4 +38,3 @@ public interface PhotoGenerationDto extends Serializable {
         return ImmutablePhotoGenerationDto.builder();
     }
 }
-

@@ -4,7 +4,11 @@ import org.abx.virturalpet.dto.PhotoGenerationDto;
 import org.abx.virturalpet.service.PhotoGenerationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class PhotoGenerationController {
@@ -15,7 +19,7 @@ public class PhotoGenerationController {
     @RequestMapping(value = "/generate-img", method = RequestMethod.POST)
     public ResponseEntity<PhotoGenerationDto> generateImg(@RequestBody PhotoGenerationDto photoGenerationDto) {
         PhotoGenerationDto imgGen = photoGenerationService.generateImg(photoGenerationDto.getImageData());
-        if ( imgGen == null) {
+        if (imgGen == null) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(PhotoGenerationDto.builder()
@@ -32,9 +36,8 @@ public class PhotoGenerationController {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(PhotoGenerationDto.builder()
-                .completed(imgGen.getCompleted())
-                .build());
+        return ResponseEntity.ok(
+                PhotoGenerationDto.builder().completed(imgGen.getCompleted()).build());
     }
 
     @RequestMapping(value = "/generate-img/get/{imgId}", method = RequestMethod.GET)
@@ -45,8 +48,7 @@ public class PhotoGenerationController {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(PhotoGenerationDto.builder()
-                .imageData(imgGen.getImageData())
-                .build());
+        return ResponseEntity.ok(
+                PhotoGenerationDto.builder().imageData(imgGen.getImageData()).build());
     }
 }

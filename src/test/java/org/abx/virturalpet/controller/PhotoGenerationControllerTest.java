@@ -31,10 +31,7 @@ public class PhotoGenerationControllerTest {
 
         when(photoGenerationService.generateImg("base64_encoded_photo")).thenReturn(response);
 
-        String requestJsonPayload = "{\n"
-                + "\"image_data\": \"base64_encoded_photo\",\n"
-                + "\"job_id\": \"1\"\n"
-                + "}";
+        String requestJsonPayload = "{\n" + "\"image_data\": \"base64_encoded_photo\",\n" + "\"job_id\": \"1\"\n" + "}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/generate-img")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -46,14 +43,12 @@ public class PhotoGenerationControllerTest {
 
     @Test
     public void testCheckJobStatus() throws Exception {
-        PhotoGenerationDto response = PhotoGenerationDto.builder()
-                .completed(true)
-                .build();
+        PhotoGenerationDto response =
+                PhotoGenerationDto.builder().completed(true).build();
 
         when(photoGenerationService.checkJobStatus("5")).thenReturn(response);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/generate-img/check/5")
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(MockMvcRequestBuilders.get("/generate-img/check/5").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.completed").value(true));
     }
@@ -63,21 +58,18 @@ public class PhotoGenerationControllerTest {
 
         when(photoGenerationService.getGenImg("100")).thenReturn(null);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/generate-img/check/100")
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(MockMvcRequestBuilders.get("/generate-img/check/100").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
     @Test
     public void testGetGenImg() throws Exception {
-        PhotoGenerationDto response = PhotoGenerationDto.builder()
-                .imageData("base64_encoded_photo")
-                .build();
+        PhotoGenerationDto response =
+                PhotoGenerationDto.builder().imageData("base64_encoded_photo").build();
 
         when(photoGenerationService.getGenImg("10")).thenReturn(response);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/generate-img/get/10")
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(MockMvcRequestBuilders.get("/generate-img/get/10").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.image_data").value("base64_encoded_photo"));
     }
@@ -87,8 +79,7 @@ public class PhotoGenerationControllerTest {
 
         when(photoGenerationService.getGenImg("100")).thenReturn(null);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/generate-img/get/100")
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(MockMvcRequestBuilders.get("/generate-img/get/100").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 }
