@@ -29,6 +29,22 @@ services:
       networks:
         - backend
 
+  virtual-pet-localstack:
+    image: localstack/localstack:latest
+    environment:
+      - AWS_DEFAULT_REGION=us-east-1
+      - EDGE_PORT=4566
+      - SERVICES=s3
+      - DEBUG=1
+    ports:
+      - "4549-4566:4549-4566"
+    volumes:
+      - ./aws:/etc/localstack/init/ready.d/  # ready hook
+      - localstack_data:/var/lib/localstack
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - backend
+
   # kafak & zookeeper
   zoo1:
     image: confluentinc/cp-zookeeper:7.2.0
