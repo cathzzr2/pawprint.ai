@@ -1,13 +1,9 @@
 package org.abx.virturalpet.model;
 
 import jakarta.persistence.Entity;
-import org.immutables.value.internal.$processor$.meta.$MongoMirrors;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.UUID;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Entity
 @Document(collection = "messages")
@@ -16,9 +12,9 @@ public class MessageModel {
     @jakarta.persistence.Id
     private UUID id;
 
-    private UUID thread_id;
+    private UUID threadId;
 
-    private UUID user_id;
+    private UUID userId;
 
     private String message;
 
@@ -54,19 +50,19 @@ public class MessageModel {
         this.timestamp = timestamp;
     }
 
-    public UUID getThread_id() {
-        return thread_id;
+    public UUID getThreadId() {
+        return threadId;
     }
 
-    public void setThread_id(UUID thread_id) {
-        this.thread_id = thread_id;
+    public void setThreadId(UUID threadId) {
+        this.threadId = threadId;
     }
 
-    public UUID getUser_id() {
-        return user_id;
+    public UUID getUserId() {
+        return userId;
     }
 
-    public void setUser_id(UUID user_id) {
-        this.user_id = user_id;
+    public void setUserId(UUID userId) {
+        this.userId = userId;
     }
 }
