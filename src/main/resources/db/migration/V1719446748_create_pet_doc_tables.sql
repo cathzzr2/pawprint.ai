@@ -28,3 +28,6 @@ CREATE TABLE IF NOT EXISTS virtual_pet_schema.user_pet (
     user_id UUID NOT NULL,
     pet_id UUID NOT NULL
     );
+
+CREATE INDEX IF NOT EXISTS user_pet_user_id_idx ON virtual_pet_schema.user_pet (user_id);
+CREATE INDEX IF NOT EXISTS user_pet_pet_id_idx ON virtual_pet_schema.user_pet (pet_id);
