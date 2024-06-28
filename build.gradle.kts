@@ -27,6 +27,12 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 
+    // aws
+    implementation(platform("software.amazon.awssdk:bom:2.25.57"))
+    // s3
+    implementation("software.amazon.awssdk:s3")
+
+
     annotationProcessor("org.immutables:value:2.9.3")
     compileOnly("org.immutables:value:2.9.3")
     runtimeOnly("org.postgresql:postgresql")
