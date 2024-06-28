@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class MessageModel {
 
     @jakarta.persistence.Id
-    private UUID id;
+    private String id;
 
     private UUID threadId;
 
@@ -20,7 +20,7 @@ public class MessageModel {
 
     private Date timestamp;
 
-    public MessageModel() {}
+    public MessageModel() { this.id = UUID.randomUUID().toString();}
 
     public MessageModel(String message) {
         this.message = message;
@@ -34,11 +34,11 @@ public class MessageModel {
         this.message = message;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
