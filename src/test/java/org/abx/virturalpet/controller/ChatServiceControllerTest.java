@@ -3,6 +3,8 @@ package org.abx.virturalpet.controller;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.UUID;
+
 import org.abx.virturalpet.dto.ImmutableSendMessageDto;
 import org.abx.virturalpet.dto.SendMessageDto;
 import org.abx.virturalpet.service.ChatService;
@@ -27,13 +29,12 @@ public class ChatServiceControllerTest {
     @Test
     public void testSendMessage_returnCreated() throws Exception {
         SendMessageDto sendMessageDto = ImmutableSendMessageDto.builder()
-                .userId(1)
-                .threadId(1)
+                .userId(UUID.randomUUID())
+                .threadId(UUID.randomUUID())
                 .messageContent("Hello, how are you?")
                 .build();
 
         SendMessageDto responseDto = ImmutableSendMessageDto.builder()
-                .messageId(456)
                 .status("Sent")
                 .statusCode(0)
                 .build();
@@ -55,18 +56,18 @@ public class ChatServiceControllerTest {
     }
 
     @Test
-    public void testFetchMessages_returnOk() throws Exception {
+    public void testFetchMessages_ByUserId_returnOk() throws Exception {
+        UUID userId = UUID.randomUUID();
         SendMessageDto message1 = ImmutableSendMessageDto.builder()
-                .userId(1)
-                .threadId(1)
+                .userId(userId)
+                .threadId(UUID.randomUUID())
                 .messageContent("Hello, how are you?")
-                .messageId(456)
                 .status("Received")
                 .build();
 
         List<SendMessageDto> messages = List.of(message1);
 
-        when(chatService.fetchMessages(1)).thenReturn(messages);
+        when(chatService.fetchMessagesByUserId(userId)).thenReturn(messages);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/messages/receive/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -77,14 +78,15 @@ public class ChatServiceControllerTest {
     }
 
     @Test
-    public void testFetchMessages_returnNotFound() throws Exception {
-        when(chatService.fetchMessages(0))
+    public void testFetchMessages_ByUserId_returnNotFound() throws Exception {
+        UUID userId = UUID.randomUUID();
+        when(chatService.fetchMessagesByUserId(userId))
                 .thenReturn(List.of(ImmutableSendMessageDto.builder()
                         .statusCode(1)
                         .status("User not found")
                         .build()));
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/messages/receive/0").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(MockMvcRequestBuilders.get("/messages/receive/{userId}").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 }
