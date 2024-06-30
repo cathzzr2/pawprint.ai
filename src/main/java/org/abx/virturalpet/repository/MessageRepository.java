@@ -11,5 +11,4 @@ public interface MessageRepository extends MongoRepository<MessageModel, String>
     List<MessageModel> findByThreadId(UUID threadId);
     MessageModel findByMessage(String message);
     List<MessageModel> findByUserId(UUID userId);
-
 }
