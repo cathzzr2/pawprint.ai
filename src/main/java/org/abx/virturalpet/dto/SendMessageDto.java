@@ -5,20 +5,22 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 
+import java.util.UUID;
+
 @Value.Immutable
 @JsonSerialize(as = ImmutableSendMessageDto.class)
 @JsonDeserialize(as = ImmutableSendMessageDto.class)
 public interface SendMessageDto {
     @JsonProperty("user_id")
     @Value.Default
-    default int getUserId() {
-        return 0;
+    default UUID getUserId() {
+        return UUID.randomUUID();
     }
 
     @JsonProperty("thread_id")
     @Value.Default
-    default int getThreadId() {
-        return 0;
+    default UUID getThreadId() {
+        return UUID.randomUUID();
     }
 
     @JsonProperty("message_content")
@@ -27,11 +29,17 @@ public interface SendMessageDto {
         return "";
     }
 
-    @JsonProperty("message_id")
+    @JsonProperty("timestamp")
     @Value.Default
-    default int getMessageId() {
-        return 0;
+    default String getTimestamp() {
+        return "";
     }
+
+//    @JsonProperty("message_id")
+//    @Value.Default
+//    default int getMessageId() {
+//        return 0;
+//    }
 
     @JsonProperty("status_code")
     @Value.Default
