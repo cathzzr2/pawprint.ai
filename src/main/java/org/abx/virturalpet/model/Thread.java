@@ -13,7 +13,6 @@ import java.util.UUID;
 public class Thread {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id", updatable = false, nullable = false)
   private Long id;
 
   @Column(name = "thread_id", nullable = false, unique = true)
@@ -28,6 +27,19 @@ public class Thread {
   @Column(name = "updated_at", nullable = false)
   private LocalDateTime updatedAt;
 
+
+  public Thread() {}
+
+
+  public Thread(UUID threadId, UUID userId, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    this.threadId = threadId;
+    this.userId = userId;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
+
+  }
+
+  // Getters and Setters
   public Long getId() {
     return id;
   }
@@ -67,5 +79,4 @@ public class Thread {
   public void setUpdatedAt(LocalDateTime updatedAt) {
     this.updatedAt = updatedAt;
   }
-
 }
