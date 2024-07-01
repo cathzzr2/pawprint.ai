@@ -57,7 +57,7 @@ public class UploadServiceController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             // TODO: LOG ERROR
-            //System.out.println(e.getMessage());
+            // System.out.println(e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

@@ -15,11 +15,11 @@ public class PetService {
             return null;
         }
         PetServiceDto updatedPet = PetServiceDto.builder()
-            .from(pet)
-            .petAge(petServiceDto.getPetAge())
-            .petName(petServiceDto.getPetName())
-            .petType(petServiceDto.getPetType())
-            .build();
+                .from(pet)
+                .petAge(petServiceDto.getPetAge())
+                .petName(petServiceDto.getPetName())
+                .petType(petServiceDto.getPetType())
+                .build();
 
         pets.put(petID, updatedPet);
         return updatedPet;
