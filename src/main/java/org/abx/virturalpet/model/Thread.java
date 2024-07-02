@@ -79,4 +79,54 @@ public class Thread {
   public void setUpdatedAt(LocalDateTime updatedAt) {
     this.updatedAt = updatedAt;
   }
+
+  public static final class ThreadBuilder {
+    private Long id;
+    private UUID threadId;
+    private UUID userId;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    private ThreadBuilder() {
+    }
+
+    public static ThreadBuilder aThread() {
+      return new ThreadBuilder();
+    }
+
+    public ThreadBuilder withId(Long id) {
+      this.id = id;
+      return this;
+    }
+
+    public ThreadBuilder withThreadId(UUID threadId) {
+      this.threadId = threadId;
+      return this;
+    }
+
+    public ThreadBuilder withUserId(UUID userId) {
+      this.userId = userId;
+      return this;
+    }
+
+    public ThreadBuilder withCreatedAt(LocalDateTime createdAt) {
+      this.createdAt = createdAt;
+      return this;
+    }
+
+    public ThreadBuilder withUpdatedAt(LocalDateTime updatedAt) {
+      this.updatedAt = updatedAt;
+      return this;
+    }
+
+    public Thread build() {
+      Thread thread = new Thread();
+      thread.setId(id);
+      thread.setThreadId(threadId);
+      thread.setUserId(userId);
+      thread.setCreatedAt(createdAt);
+      thread.setUpdatedAt(updatedAt);
+      return thread;
+    }
+  }
 }
