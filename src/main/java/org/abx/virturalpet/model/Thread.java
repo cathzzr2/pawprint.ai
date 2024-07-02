@@ -69,4 +69,46 @@ public class Thread {
     public void setId(Long id) {
         this.id = id;
     }
+
+    public static final class ThreadBuilder {
+
+        private Thread thread;
+
+        private ThreadBuilder() {
+            thread = new Thread();
+        }
+
+        public static ThreadBuilder aThread() {
+            return new ThreadBuilder();
+        }
+
+        public ThreadBuilder withId(Long id) {
+            thread.setId(id);
+            return this;
+        }
+
+        public ThreadBuilder withThreadId(UUID threadId) {
+            thread.setThreadId(threadId);
+            return this;
+        }
+
+        public ThreadBuilder withUserId(UUID userId) {
+            thread.setUserId(userId);
+            return this;
+        }
+
+        public ThreadBuilder withCreatedAt(LocalDateTime createdAt) {
+            thread.setCreatedAt(createdAt);
+            return this;
+        }
+
+        public ThreadBuilder withUpdatedAt(LocalDateTime updatedAt) {
+            thread.setUpdatedAt(updatedAt);
+            return this;
+        }
+
+        public Thread build() {
+            return thread;
+        }
+    }
 }
