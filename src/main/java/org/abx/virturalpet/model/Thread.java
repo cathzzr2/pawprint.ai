@@ -1,4 +1,5 @@
 package org.abx.virturalpet.model;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,122 +12,61 @@ import java.util.UUID;
 @Entity
 @Table(name = "thread", schema = "virtual_pet_schema")
 public class Thread {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
-
-  @Column(name = "thread_id", nullable = false, unique = true)
-  private UUID threadId;
-
-  @Column(name = "user_id", nullable = false)
-  private UUID userId;
-
-  @Column(name = "created_at", nullable = false)
-  private LocalDateTime createdAt;
-
-  @Column(name = "updated_at", nullable = false)
-  private LocalDateTime updatedAt;
-
-
-  public Thread() {}
-
-
-  public Thread(UUID threadId, UUID userId, LocalDateTime createdAt, LocalDateTime updatedAt) {
-    this.threadId = threadId;
-    this.userId = userId;
-    this.createdAt = createdAt;
-    this.updatedAt = updatedAt;
-
-  }
-
-  // Getters and Setters
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public UUID getThreadId() {
-    return threadId;
-  }
-
-  public void setThreadId(UUID threadId) {
-    this.threadId = threadId;
-  }
-
-  public UUID getUserId() {
-    return userId;
-  }
-
-  public void setUserId(UUID userId) {
-    this.userId = userId;
-  }
-
-  public LocalDateTime getCreatedAt() {
-    return createdAt;
-  }
-
-  public void setCreatedAt(LocalDateTime createdAt) {
-    this.createdAt = createdAt;
-  }
-
-  public LocalDateTime getUpdatedAt() {
-    return updatedAt;
-  }
-
-  public void setUpdatedAt(LocalDateTime updatedAt) {
-    this.updatedAt = updatedAt;
-  }
-
-  public static final class ThreadBuilder {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "thread_id", nullable = false, unique = true)
     private UUID threadId;
+
+    @Column(name = "user_id", nullable = false)
     private UUID userId;
+
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    private ThreadBuilder() {
+    public Thread() {}
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 
-    public static ThreadBuilder aThread() {
-      return new ThreadBuilder();
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
-    public ThreadBuilder withId(Long id) {
-      this.id = id;
-      return this;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public ThreadBuilder withThreadId(UUID threadId) {
-      this.threadId = threadId;
-      return this;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public ThreadBuilder withUserId(UUID userId) {
-      this.userId = userId;
-      return this;
+    public UUID getUserId() {
+        return userId;
     }
 
-    public ThreadBuilder withCreatedAt(LocalDateTime createdAt) {
-      this.createdAt = createdAt;
-      return this;
+    public void setUserId(UUID userId) {
+        this.userId = userId;
     }
 
-    public ThreadBuilder withUpdatedAt(LocalDateTime updatedAt) {
-      this.updatedAt = updatedAt;
-      return this;
+    public UUID getThreadId() {
+        return threadId;
     }
 
-    public Thread build() {
-      Thread thread = new Thread();
-      thread.setId(id);
-      thread.setThreadId(threadId);
-      thread.setUserId(userId);
-      thread.setCreatedAt(createdAt);
-      thread.setUpdatedAt(updatedAt);
-      return thread;
+    public void setThreadId(UUID threadId) {
+        this.threadId = threadId;
     }
-  }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 }
