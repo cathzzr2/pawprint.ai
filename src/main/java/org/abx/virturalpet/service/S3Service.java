@@ -70,7 +70,7 @@ public class S3Service {
 
             s3Client.putObject(putOb, RequestBody.fromFile(new File(filePath)));
             logger.info("Successfully placed {} into bucket {}", objectKey, bucketName);
-        }  catch (S3Exception e) {
+        } catch (S3Exception e) {
             logger.error("Failed to upload {} to bucket {}", objectKey, bucketName, e);
         }
     }
