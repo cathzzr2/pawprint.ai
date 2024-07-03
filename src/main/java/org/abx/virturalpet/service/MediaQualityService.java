@@ -1,5 +1,6 @@
 package org.abx.virturalpet.service;
 
+import java.sql.Timestamp;
 import java.util.UUID;
 import org.abx.virturalpet.dto.ImmutableImprovePhotoJbDto;
 import org.abx.virturalpet.dto.ImmutableImprovedPhotoResultDto;
@@ -10,27 +11,36 @@ import org.springframework.stereotype.Service;
 @Service
 public class MediaQualityService {
 
-    public ImprovePhotoJbDto enqueuePhoto(String photoFile) {
-        if (photoFile == null || photoFile.isEmpty()) {
+    public ImprovePhotoJbDto enqueuePhoto(UUID userId, UUID photoId, String jobType) {
+        if (photoId == null || userId == null || jobType == null) {
             return null;
-        }
+        } // check how to check uuid valid
 
-        String jobId = UUID.randomUUID().toString(); // generate new photo ID
+        UUID jobId = UUID.randomUUID();
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
         return ImmutableImprovePhotoJbDto.builder()
-                .improvePhotoJbId(jobId)
-                .photoFile(photoFile)
+                .photoId(photoId)
+                .jobId(jobId)
+                .userId(userId)
+                .jobType(jobType)
+                .jobSubmissionTime(timestamp)
                 .build();
     }
 
-    public ImprovedPhotoResultDto getImprovedPhoto(String improvedPhotoId) {
-        if (improvedPhotoId == null || improvedPhotoId.isEmpty()) {
+    public ImprovedPhotoResultDto getImprovedPhoto(UUID userId, UUID jobId, String s3Key) {
+        if (jobId == null || userId == null || s3Key == null) {
             return null;
         }
 
-        String improvedPhotoUrl = "http://example.com/path/to/photo/" + improvedPhotoId + ".jpg";
+        UUID resultId = UUID.randomUUID();
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         return ImmutableImprovedPhotoResultDto.builder()
-                .improvedPhotoUrl(improvedPhotoUrl)
+                .resultId(resultId)
+                .userId(userId)
+                .jobId(jobId)
+                .s3Key(s3Key)
+                .generatedTime(timestamp)
                 .build();
     }
 }
