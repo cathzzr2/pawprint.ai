@@ -2,10 +2,10 @@ package org.abx.virturalpet.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.sql.Timestamp;
 import java.util.UUID;
 
@@ -82,7 +82,8 @@ public class PhotoModel {
 
     @Override
     public String toString() {
-        return "Photo{" + "id=" + photoId + ", user=" + userId + ", upload time=" + uploadTime + ", s3 key=" + s3Key + '}';
+        return "Photo{" + "id=" + photoId + ", user=" + userId + ", upload time=" + uploadTime + ", s3 key=" + s3Key
+                + '}';
     }
 
     public static final class Builder {
