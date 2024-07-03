@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/photos")
 public class MediaQualityServiceController {
     private static final Logger logger = LoggerFactory.getLogger(MediaQualityServiceController.class);
 
@@ -41,12 +42,8 @@ public class MediaQualityServiceController {
     }
 
     @RequestMapping(value = "/results/{jobId}", method = RequestMethod.GET)
-    public ResponseEntity<ImprovedPhotoResultDto> getImprovedPhoto(
-            @PathVariable ImprovedPhotoResultDto improvedPhotoResultDto) {
-        UUID userId = improvedPhotoResultDto.getUserId();
-        UUID jobId = improvedPhotoResultDto.getJobId();
-        String s3Key = improvedPhotoResultDto.getS3Key();
-        ImprovedPhotoResultDto res = mediaQualityService.getImprovedPhoto(userId, jobId, s3Key);
+    public ResponseEntity<ImprovedPhotoResultDto> getImprovedPhoto(@PathVariable UUID jobId) {
+        ImprovedPhotoResultDto res = mediaQualityService.getImprovedPhoto(jobId);
 
         if (res == null) {
             return ResponseEntity.notFound().build();
