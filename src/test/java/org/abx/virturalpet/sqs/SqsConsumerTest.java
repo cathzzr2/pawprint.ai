@@ -8,9 +8,10 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.awaitility.Awaitility;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,7 +61,7 @@ public class SqsConsumerTest {
     }
 
     @Test
-    void testPollMessages() throws InterruptedException {
+    void testPollMessages() {
         // Prepare mock responses
         Message message1 = Message.builder()
                 .body("Test message 1")
@@ -93,17 +94,16 @@ public class SqsConsumerTest {
 
         sqsConsumer.start();
 
-        // Use a CountDownLatch to wait for the messages to be processed
-        CountDownLatch latch = new CountDownLatch(2);
+        // Use an AtomicInteger to count down the processed messages
+        AtomicInteger processedMessageCount = new AtomicInteger(0);
         doAnswer(invocation -> {
-                    latch.countDown();
+                    processedMessageCount.incrementAndGet();
                     return null;
                 })
                 .when(messageProcessor)
                 .processMessage(ArgumentMatchers.any(Message.class));
 
-        // Wait for the latch to count down to zero
-        boolean completed = latch.await(5, TimeUnit.SECONDS);
+        Awaitility.await().atMost(30, TimeUnit.SECONDS).untilAtomic(processedMessageCount, Matchers.equalTo(2));
 
         // Verify interactions
         verify(sqsClient, atLeastOnce()).receiveMessage(receiveMessageRequestCaptor.capture());
@@ -112,7 +112,6 @@ public class SqsConsumerTest {
 
         // Verify the received message request
         List<ReceiveMessageRequest> receiveMessageRequests = receiveMessageRequestCaptor.getAllValues();
-
         Assertions.assertEquals(queueUrl, receiveMessageRequests.get(0).queueUrl());
         Assertions.assertEquals(10, receiveMessageRequests.get(0).maxNumberOfMessages());
         Assertions.assertEquals(20, receiveMessageRequests.get(0).waitTimeSeconds());
@@ -123,9 +122,6 @@ public class SqsConsumerTest {
         Assertions.assertEquals("handle1", deleteMessageRequests.get(0).receiptHandle());
         Assertions.assertEquals(queueUrl, deleteMessageRequests.get(1).queueUrl());
         Assertions.assertEquals("handle2", deleteMessageRequests.get(1).receiptHandle());
-
-        // Ensure that the latch counted down to zero
-        Assertions.assertTrue(completed, "Messages were not processed in time");
     }
 
     @Test

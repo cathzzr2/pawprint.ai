@@ -44,6 +44,7 @@ dependencies {
     // test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("com.h2database:h2")
+    testImplementation("org.awaitility:awaitility:3.0.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
