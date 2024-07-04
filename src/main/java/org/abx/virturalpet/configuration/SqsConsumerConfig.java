@@ -13,12 +13,15 @@ import software.amazon.awssdk.services.sqs.SqsClient;
 @Profile("!test")
 public class SqsConsumerConfig {
 
+    // create your own message processor for different tasks
     @Bean
     public GenImageSqsMessageProcessor genImageSqsMessageProcessor() {
         return new GenImageSqsMessageProcessor();
     }
 
+    // feed in different message processor to process different job
     @Bean
+    @Qualifier("ImageJobSqsConsumer")
     public SqsConsumer sqsConsumer(
             SqsClient sqsClient,
             @Qualifier("ImageJobSqsQueueName") String queueUrl,

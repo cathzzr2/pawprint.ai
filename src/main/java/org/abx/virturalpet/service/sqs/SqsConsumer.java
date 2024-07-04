@@ -78,7 +78,7 @@ public class SqsConsumer implements DisposableBean {
         stop();
     }
 
-    public void stop() { // Add this method
+    public void stop() {
         running = false;
         executorService.shutdownNow();
         try {
