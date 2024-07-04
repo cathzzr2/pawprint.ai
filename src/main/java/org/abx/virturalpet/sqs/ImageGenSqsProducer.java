@@ -1,4 +1,4 @@
-package org.abx.virturalpet.service.sqs;
+package org.abx.virturalpet.sqs;
 
 import org.abx.virturalpet.dto.ImageGenSqsDto;
 import org.abx.virturalpet.exception.SqsProducerException;

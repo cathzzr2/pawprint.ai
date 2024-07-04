@@ -1,4 +1,4 @@
-package org.abx.virturalpet.service.sqs;
+package org.abx.virturalpet.sqs;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;

@@ -6,13 +6,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import org.abx.virturalpet.service.sqs.MessageProcessor;
-import org.abx.virturalpet.service.sqs.SqsConsumer;
+import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +30,7 @@ import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageResponse;
 
 @ExtendWith(MockitoExtension.class)
-class SqsConsumerTest {
+public class SqsConsumerTest {
 
     @Mock
     private SqsClient sqsClient;
@@ -55,6 +54,11 @@ class SqsConsumerTest {
         sqsConsumer = new SqsConsumer(sqsClient, queueUrl, messageProcessor);
     }
 
+    @AfterEach
+    void after() {
+        sqsConsumer.stop();
+    }
+
     @Test
     void testPollMessages() throws InterruptedException {
         // Prepare mock responses
@@ -71,10 +75,23 @@ class SqsConsumerTest {
         DeleteMessageResponse deleteMessageResponse =
                 DeleteMessageResponse.builder().build();
 
+        AtomicInteger receiveMessageCount = new AtomicInteger(0);
+
         when(sqsClient.receiveMessage(ArgumentMatchers.any(ReceiveMessageRequest.class)))
-                .thenReturn(receiveMessageResponse);
+                .thenAnswer(invocation -> {
+                    if (receiveMessageCount.incrementAndGet() <= 1) {
+                        return receiveMessageResponse;
+                    } else {
+                        return ReceiveMessageResponse.builder()
+                                .messages(Collections.emptyList())
+                                .build();
+                    }
+                });
+
         when(sqsClient.deleteMessage(ArgumentMatchers.any(DeleteMessageRequest.class)))
-                .thenReturn(deleteMessageResponse);
+                .thenAnswer(invocation -> deleteMessageResponse);
+
+        sqsConsumer.start();
 
         // Use a CountDownLatch to wait for the messages to be processed
         CountDownLatch latch = new CountDownLatch(2);
@@ -85,15 +102,8 @@ class SqsConsumerTest {
                 .when(messageProcessor)
                 .processMessage(ArgumentMatchers.any(Message.class));
 
-        // Start polling in a separate thread
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.submit(() -> sqsConsumer.pollMessages());
-
         // Wait for the latch to count down to zero
-        boolean completed = latch.await(15, TimeUnit.SECONDS);
-
-        // Stop the consumer
-        sqsConsumer.stop();
+        boolean completed = latch.await(5, TimeUnit.SECONDS);
 
         // Verify interactions
         verify(sqsClient, atLeastOnce()).receiveMessage(receiveMessageRequestCaptor.capture());

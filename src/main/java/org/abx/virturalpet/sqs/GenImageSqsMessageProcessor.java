@@ -1,4 +1,4 @@
-package org.abx.virturalpet.service.sqs;
+package org.abx.virturalpet.sqs;
 
 import software.amazon.awssdk.services.sqs.model.Message;
 

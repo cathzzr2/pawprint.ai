@@ -1,8 +1,8 @@
 package org.abx.virturalpet.configuration;
 
-import org.abx.virturalpet.service.sqs.GenImageSqsMessageProcessor;
-import org.abx.virturalpet.service.sqs.MessageProcessor;
-import org.abx.virturalpet.service.sqs.SqsConsumer;
+import org.abx.virturalpet.sqs.GenImageSqsMessageProcessor;
+import org.abx.virturalpet.sqs.MessageProcessor;
+import org.abx.virturalpet.sqs.SqsConsumer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

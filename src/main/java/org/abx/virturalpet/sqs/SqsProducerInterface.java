@@ -1,4 +1,4 @@
-package org.abx.virturalpet.service.sqs;
+package org.abx.virturalpet.sqs;
 
 public interface SqsProducerInterface<QueueMessage> {
     void sendMessage(QueueMessage message);
