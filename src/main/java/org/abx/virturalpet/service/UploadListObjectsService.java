@@ -23,7 +23,6 @@ public class UploadListObjectsService {
     @Autowired
     public UploadListObjectsService(S3Client s3Client) {
         this.s3Client = s3Client;
-        // this.photoRepository = photoRepository;
     }
 
     public UploadServiceDto listObject(String bucketName, String prefix) {
