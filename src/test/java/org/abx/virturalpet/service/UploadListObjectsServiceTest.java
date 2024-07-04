@@ -15,8 +15,6 @@ import org.mockito.Mockito;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
-import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
-import software.amazon.awssdk.services.s3.model.ListObjectsResponse;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.S3Object;
@@ -57,10 +55,11 @@ public class UploadListObjectsServiceTest {
 
     @Test
     public void testListObject_notFound() {
-        ListObjectsResponse listObjectsResponse =
-                ListObjectsResponse.builder().contents(Collections.emptyList()).build();
+        ListObjectsV2Response listObjectsV2Response = ListObjectsV2Response.builder()
+                .contents(Collections.emptyList())
+                .build();
 
-        when(s3Client.listObjects(Mockito.any(ListObjectsRequest.class))).thenReturn(listObjectsResponse);
+        when(s3Client.listObjectsV2(Mockito.any(ListObjectsV2Request.class))).thenReturn(listObjectsV2Response);
 
         UploadServiceDto actualResult = uploadListObjectsService.listObject("test-bucket", "test-prefix");
 

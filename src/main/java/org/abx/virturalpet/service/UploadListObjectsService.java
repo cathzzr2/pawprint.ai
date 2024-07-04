@@ -7,6 +7,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.abx.virturalpet.dto.ImmutableUploadServiceDto;
 import org.abx.virturalpet.dto.UploadServiceDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -18,6 +20,7 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 
 @Service
 public class UploadListObjectsService {
+    private static final Logger logger = LoggerFactory.getLogger(UploadListObjectsService.class);
     private final S3Client s3Client;
 
     @Autowired
@@ -32,13 +35,11 @@ public class UploadListObjectsService {
                 .maxKeys(1) // only get one object
                 .build();
 
-        ListObjectsV2Response listObjectsV2Response = null;
+        ListObjectsV2Response listObjectsV2Response;
         try {
             listObjectsV2Response = s3Client.listObjectsV2(listObjectsV2Request);
         } catch (S3Exception e) {
-            // System.err.println(e.awsErrorDetails().errorMessage());
-        }
-        if (listObjectsV2Response == null || listObjectsV2Response.contents().isEmpty()) {
+            logger.error("Error listing objects in bucket {} with prefix {}", bucketName, prefix, e);
             return null;
         }
 
@@ -67,15 +68,12 @@ public class UploadListObjectsService {
                 .maxKeys(limit)
                 .build();
 
-        ListObjectsV2Response listObjectsV2Response = null;
+        ListObjectsV2Response listObjectsV2Response;
         try {
             listObjectsV2Response = s3Client.listObjectsV2(listObjectsV2Request);
         } catch (S3Exception e) {
-            // System.err.println(e.awsErrorDetails().errorMessage());
-        }
-
-        if (listObjectsV2Response == null || listObjectsV2Response.contents().isEmpty()) {
-            return List.of(); // return empty list
+            logger.error("Error listing objects in bucket {} with prefix {}", bucketName, prefix, e);
+            return List.of();
         }
 
         return listObjectsV2Response.contents().stream()
@@ -111,7 +109,7 @@ public class UploadListObjectsService {
             HeadObjectResponse headObjectResponse = s3Client.headObject(headObjectRequest);
             return headObjectResponse.metadata();
         } catch (S3Exception e) {
-            // System.err.println(e.awsErrorDetails().errorMessage());
+            logger.error("Error getting metadata for object {} in bucket {}", key, bucketName, e);
             return Map.of(); // return null
         }
     }
