@@ -32,6 +32,16 @@ public class S3Service {
     // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javav2/example_code/s3/src/main/java/com/example/s3/GeneratePresignedUrlAndUploadObject.java
     // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javav2/example_code/s3/src/main/java/com/example/s3/GeneratePresignedUrlAndPutFileWithMetadata.java
     // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javav2/example_code/s3/src/main/java/com/example/s3/GeneratePresignedGetUrlAndRetrieve.java
+    public class GeneratePresignedUrlException extends RuntimeException {
+        public GeneratePresignedUrlException(String message) {
+            super(message);
+        }
+
+        public GeneratePresignedUrlException(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }
+
     public String generatePresignedUrl(String bucketName, String objectKey) {
         try (S3Presigner presigner = S3Presigner.create()) {
             PutObjectRequest objectRequest = PutObjectRequest.builder()
@@ -49,10 +59,11 @@ public class S3Service {
             logger.info(
                     "Which HTTP method needs to be used when uploading: [{}]",
                     presignedRequest.httpRequest().method());
-            return presignedRequest.url().toString();
+            return myUrl;
         } catch (S3Exception e) {
             logger.error("Failed to generate presigned URL", e);
-            return null;
+            throw new GeneratePresignedUrlException(
+                    "Failed to generate presigned URL for bucket " + bucketName + " and object " + objectKey, e);
         }
     }
 
