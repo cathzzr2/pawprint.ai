@@ -4,7 +4,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.UUID;
-
 import org.abx.virturalpet.dto.ImmutableSendMessageDto;
 import org.abx.virturalpet.dto.SendMessageDto;
 import org.abx.virturalpet.service.ChatService;
@@ -28,53 +27,62 @@ public class ChatServiceControllerTest {
 
     @Test
     public void testSendMessage_returnCreated() throws Exception {
-        SendMessageDto sendMessageDto = ImmutableSendMessageDto.builder()
-                .userId(UUID.randomUUID())
-                .threadId(UUID.randomUUID())
+        SendMessageDto message = ImmutableSendMessageDto.builder()
+                .userId(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"))
+                .threadId(UUID.fromString("123e4567-e89b-12d3-a456-426614174001"))
                 .messageContent("Hello, how are you?")
-                .build();
-
-        SendMessageDto responseDto = ImmutableSendMessageDto.builder()
+                .timestamp("2021-09-01T12:00:00")
                 .status("Sent")
                 .statusCode(0)
                 .build();
 
-        when(chatService.sendMessage(sendMessageDto)).thenReturn(responseDto);
+        when(chatService.sendMessage(message)).thenReturn(message);
 
-        String requestJsonPayload = "{\n"
-                + "\"user_id\": 1,\n"
-                + "\"thread_id\": 1,\n"
-                + "\"message_content\": \"Hello, how are you?\"\n"
+        String messageContent = "{\n"
+                + "\"user_id\": \"123e4567-e89b-12d3-a456-426614174000\",\n"
+                + "\"thread_id\": \"123e4567-e89b-12d3-a456-426614174001\",\n"
+                + "\"message_content\": \"Hello, how are you?\",\n"
+                + "\"timestamp\": \"2021-09-01T12:00:00\",\n"
+                + "\"status\": \"Sent\",\n"
+                + "\"status_code\": 0\n"
                 + "}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/messages/send")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestJsonPayload))
+                        .content(messageContent))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message_id").value(456))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value("Sent"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.user_id").value("123e4567-e89b-12d3-a456-426614174000"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.thread_id").value("123e4567-e89b-12d3-a456-426614174001"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message_content").value("Hello, how are you?"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value("2021-09-01T12:00:00"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value("Sent"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status_code").value(0));
+
     }
 
     @Test
     public void testFetchMessages_ByUserId_returnOk() throws Exception {
         UUID userId = UUID.randomUUID();
-        SendMessageDto message1 = ImmutableSendMessageDto.builder()
-                .userId(userId)
-                .threadId(UUID.randomUUID())
-                .messageContent("Hello, how are you?")
-                .status("Received")
-                .build();
+        when(chatService.fetchMessagesByUserId(userId))
+                .thenReturn(List.of(ImmutableSendMessageDto.builder()
+                        .userId(userId)
+                        .threadId(UUID.randomUUID())
+                        .messageContent("Hello, how are you?")
+                        .timestamp("2021-09-01T12:00:00")
+                        .statusCode(0)
+                        .status("Success")
+                        .build()));
 
-        List<SendMessageDto> messages = List.of(message1);
-
-        when(chatService.fetchMessagesByUserId(userId)).thenReturn(messages);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/messages/receive/1").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(MockMvcRequestBuilders.get("/messages/receive/user/{userId}", userId)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].message_id").value(456))
-                .andExpect(
-                        MockMvcResultMatchers.jsonPath("$[0].message_content").value("Hello, how are you?"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].status").value("Received"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].user_id").value(userId.toString()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].thread_id").isNotEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].message_content").value("Hello, how are you?"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].timestamp").value("2021-09-01T12:00:00"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].status_code").value(0))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].status").value("Success"));
+
     }
 
     @Test
@@ -82,11 +90,71 @@ public class ChatServiceControllerTest {
         UUID userId = UUID.randomUUID();
         when(chatService.fetchMessagesByUserId(userId))
                 .thenReturn(List.of(ImmutableSendMessageDto.builder()
+                        .userId(userId)
+                        .threadId(UUID.randomUUID())
+                        .messageContent("Hello, how are you?")
+                        .timestamp("2021-09-01T12:00:00")
                         .statusCode(1)
-                        .status("User not found")
+                        .status("Failed")
                         .build()));
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/messages/receive/{userId}").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
+        mockMvc.perform(MockMvcRequestBuilders.get("/messages/receive/user/{userId}", userId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].user_id").value(userId.toString()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].thread_id").isNotEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].message_content").value("Hello, how are you?"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].timestamp").value("2021-09-01T12:00:00"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].status_code").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].status").value("Failed"));
+    }
+
+    @Test
+    public void testFetchMessages_ByThreadId_returnOk() throws Exception {
+        UUID threadId = UUID.randomUUID();
+        when(chatService.fetchMessagesByThreadId(threadId))
+                .thenReturn(List.of(ImmutableSendMessageDto.builder()
+                        .userId(UUID.randomUUID())
+                        .threadId(threadId)
+                        .messageContent("Hello, how are you?")
+                        .timestamp("2021-09-01T12:00:00")
+                        .statusCode(0)
+                        .status("Success")
+                        .build()));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/messages/receive/thread/{threadId}", threadId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].user_id").isNotEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].thread_id").value(threadId.toString()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].message_content").value("Hello, how are you?"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].timestamp").value("2021-09-01T12:00:00"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].status_code").value(0))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].status").value("Success"));
+
+    }
+
+    @Test
+    public void testFetchMessages_ByThreadId_returnNotFound() throws Exception {
+        UUID threadId = UUID.randomUUID();
+        when(chatService.fetchMessagesByThreadId(threadId))
+                .thenReturn(List.of(ImmutableSendMessageDto.builder()
+                        .userId(UUID.randomUUID())
+                        .threadId(threadId)
+                        .messageContent("Hello, how are you?")
+                        .timestamp("2021-09-01T12:00:00")
+                        .statusCode(1)
+                        .status("Failed")
+                        .build()));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/messages/receive/thread/{threadId}", threadId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].user_id").isNotEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].thread_id").value(threadId.toString()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].message_content").value("Hello, how are you?"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].timestamp").value("2021-09-01T12:00:00"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].status_code").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].status").value("Failed"));
     }
 }

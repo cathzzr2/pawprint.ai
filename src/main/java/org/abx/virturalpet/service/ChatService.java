@@ -3,7 +3,6 @@ package org.abx.virturalpet.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 import org.abx.virturalpet.dto.ImmutableSendMessageDto;
 import org.abx.virturalpet.dto.SendMessageDto;
 import org.abx.virturalpet.model.MessageModel;
@@ -16,7 +15,6 @@ public class ChatService {
     private static final String MESSAGE_SENT_SUCCESSFULLY = "Message Sent Successfully";
     private static final String MESSAGE_RECEIVED_SUCCESSFULLY = "Message Received Successfully";
 
-//    private final List<SendMessageDto> messages = new ArrayList<>();
     private final MessageRepository messageRepository;
 
     public ChatService(MessageRepository messageRepository) {
@@ -96,7 +94,11 @@ public class ChatService {
     }
 
     public MessageModel fromMessageDto(SendMessageDto sendMessageDto) {
-        return new MessageModel(sendMessageDto.getMessageContent());
+        MessageModel messageModel = new MessageModel();
+        messageModel.setUserId(sendMessageDto.getUserId());
+        messageModel.setThreadId(sendMessageDto.getThreadId());
+        messageModel.setMessage(sendMessageDto.getMessageContent());
+        return messageModel;
     }
 
 }
