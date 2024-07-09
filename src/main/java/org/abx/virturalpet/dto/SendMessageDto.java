@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.util.UUID;
 import org.immutables.value.Value;
 
+import java.util.UUID;
+
 @Value.Immutable
 @JsonSerialize(as = ImmutableSendMessageDto.class)
 @JsonDeserialize(as = ImmutableSendMessageDto.class)
@@ -33,6 +35,12 @@ public interface SendMessageDto {
     default String getTimestamp() {
         return "";
     }
+
+//    @JsonProperty("message_id")
+//    @Value.Default
+//    default int getMessageId() {
+//        return 0;
+//    }
 
     @JsonProperty("status_code")
     @Value.Default
