@@ -1,7 +1,6 @@
 package org.abx.virturalpet.service;
 
 import com.adobe.testing.s3mock.testcontainers.S3MockContainer;
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -131,7 +130,5 @@ public class S3ServiceTest {
             Assertions.assertEquals("Failed to upload to S3", e.getMessage());
             logger.info("Correctly failed to upload to an invalid bucket");
         }
-
-
     }
 }
