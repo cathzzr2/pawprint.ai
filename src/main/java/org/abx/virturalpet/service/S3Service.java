@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -20,11 +21,13 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 public class S3Service {
 
     private final S3Client s3Client;
-
+    private final S3Presigner s3Presigner;
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(S3Service.class);
 
-    public S3Service(S3Client s3Client) {
+    @Autowired
+    public S3Service(S3Client s3Client, S3Presigner s3Presigner) {
         this.s3Client = s3Client;
+        this.s3Presigner = s3Presigner;
     }
 
     // TODO: Implement this method
@@ -33,43 +36,46 @@ public class S3Service {
     // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javav2/example_code/s3/src/main/java/com/example/s3/GeneratePresignedUrlAndPutFileWithMetadata.java
     // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javav2/example_code/s3/src/main/java/com/example/s3/GeneratePresignedGetUrlAndRetrieve.java
     public class GeneratePresignedUrlException extends RuntimeException {
-        public GeneratePresignedUrlException(String message) {
-            super(message);
-        }
-
         public GeneratePresignedUrlException(String message, Throwable cause) {
             super(message, cause);
         }
     }
 
     public String generatePresignedUrl(String bucketName, String objectKey) {
-        try (S3Presigner presigner = S3Presigner.create()) {
+        try {
             PutObjectRequest objectRequest = PutObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(objectKey)
-                    .contentType("text/plain")
-                    .build();
+                .bucket(bucketName)
+                .key(objectKey)
+                .contentType("text/plain")
+                .build();
             PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
-                    .signatureDuration(Duration.ofMinutes(10)) // The URL will expire in 10 minutes.
-                    .putObjectRequest(objectRequest)
-                    .build();
-            PresignedPutObjectRequest presignedRequest = presigner.presignPutObject(presignRequest);
+                .signatureDuration(Duration.ofMinutes(10)) // The URL will expire in 10 minutes.
+                .putObjectRequest(objectRequest)
+                .build();
+            PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(presignRequest);
             String myUrl = presignedRequest.url().toString();
             logger.info("Presigned URL to upload to: [{}]", myUrl);
             logger.info(
-                    "Which HTTP method needs to be used when uploading: [{}]",
-                    presignedRequest.httpRequest().method());
+                "Which HTTP method needs to be used when uploading: [{}]",
+                presignedRequest.httpRequest().method());
             return myUrl;
         } catch (S3Exception e) {
             logger.error("Failed to generate presigned URL", e);
             throw new GeneratePresignedUrlException(
-                    "Failed to generate presigned URL for bucket " + bucketName + " and object " + objectKey, e);
+                "Failed to generate presigned URL for bucket " + bucketName + " and object " + objectKey, e);
         }
     }
 
+
     // reference:
     // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javav2/example_code/s3/src/main/java/com/example/s3/PutObject.java
-    public void uploadObject(String bucketName, String objectKey, String filePath) {
+    public class S3UploadException extends Exception {
+        public S3UploadException(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }
+
+    public void uploadObject(String bucketName, String objectKey, String filePath) throws S3UploadException {
         try {
             Map<String, String> metadata = new HashMap<>();
             metadata.put("x-amz-meta-myVal", "test");
@@ -83,6 +89,7 @@ public class S3Service {
             logger.info("Successfully placed {} into bucket {}", objectKey, bucketName);
         } catch (S3Exception e) {
             logger.error("Failed to upload {} to bucket {}", objectKey, bucketName, e);
+            throw new S3UploadException("Failed to upload to S3", e);
         }
     }
 
