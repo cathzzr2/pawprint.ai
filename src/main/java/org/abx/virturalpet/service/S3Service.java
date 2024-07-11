@@ -44,28 +44,27 @@ public class S3Service {
     public String generatePresignedUrl(String bucketName, String objectKey) {
         try {
             PutObjectRequest objectRequest = PutObjectRequest.builder()
-                .bucket(bucketName)
-                .key(objectKey)
-                .contentType("text/plain")
-                .build();
+                    .bucket(bucketName)
+                    .key(objectKey)
+                    .contentType("text/plain")
+                    .build();
             PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(10)) // The URL will expire in 10 minutes.
-                .putObjectRequest(objectRequest)
-                .build();
+                    .signatureDuration(Duration.ofMinutes(10)) // The URL will expire in 10 minutes.
+                    .putObjectRequest(objectRequest)
+                    .build();
             PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(presignRequest);
             String myUrl = presignedRequest.url().toString();
             logger.info("Presigned URL to upload to: [{}]", myUrl);
             logger.info(
-                "Which HTTP method needs to be used when uploading: [{}]",
-                presignedRequest.httpRequest().method());
+                    "Which HTTP method needs to be used when uploading: [{}]",
+                    presignedRequest.httpRequest().method());
             return myUrl;
         } catch (S3Exception e) {
             logger.error("Failed to generate presigned URL", e);
             throw new GeneratePresignedUrlException(
-                "Failed to generate presigned URL for bucket " + bucketName + " and object " + objectKey, e);
+                    "Failed to generate presigned URL for bucket " + bucketName + " and object " + objectKey, e);
         }
     }
-
 
     // reference:
     // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javav2/example_code/s3/src/main/java/com/example/s3/PutObject.java

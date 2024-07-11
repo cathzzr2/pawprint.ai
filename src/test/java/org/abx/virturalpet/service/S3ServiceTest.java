@@ -1,8 +1,13 @@
 package org.abx.virturalpet.service;
 
 import com.adobe.testing.s3mock.testcontainers.S3MockContainer;
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.abx.virturalpet.configuration.S3ClientConfig;
+import org.abx.virturalpet.service.S3Service.S3UploadException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,36 +49,35 @@ public class S3ServiceTest {
         s3Mock.start();
         var endpoint = s3Mock.getHttpsEndpoint();
         var serviceConfig =
-            S3Configuration.builder().pathStyleAccessEnabled(true).build();
+                S3Configuration.builder().pathStyleAccessEnabled(true).build();
         var httpClient = UrlConnectionHttpClient.builder()
-            .buildWithDefaults(AttributeMap.builder()
-                .put(SdkHttpConfigurationOption.TRUST_ALL_CERTIFICATES, Boolean.TRUE)
-                .build());
+                .buildWithDefaults(AttributeMap.builder()
+                        .put(SdkHttpConfigurationOption.TRUST_ALL_CERTIFICATES, Boolean.TRUE)
+                        .build());
 
         // Provide credentials for the S3 client
-        var credentialsProvider = StaticCredentialsProvider.create(
-            AwsBasicCredentials.create("accessKeyId", "secretAccessKey")
-        );
+        var credentialsProvider =
+                StaticCredentialsProvider.create(AwsBasicCredentials.create("accessKeyId", "secretAccessKey"));
 
         s3Client = S3Client.builder()
-            .endpointOverride(URI.create(endpoint))
-            .region(Region.US_EAST_1)
-            .httpClient(httpClient)
-            .credentialsProvider(credentialsProvider)
-            .serviceConfiguration(serviceConfig)
-            .build();
+                .endpointOverride(URI.create(endpoint))
+                .region(Region.US_EAST_1)
+                .httpClient(httpClient)
+                .credentialsProvider(credentialsProvider)
+                .serviceConfiguration(serviceConfig)
+                .build();
 
         s3Presigner = S3Presigner.builder()
-            .endpointOverride(URI.create(endpoint))
-            .region(Region.US_EAST_1)
-            .credentialsProvider(credentialsProvider)
-            .serviceConfiguration(serviceConfig)
-            .build();
+                .endpointOverride(URI.create(endpoint))
+                .region(Region.US_EAST_1)
+                .credentialsProvider(credentialsProvider)
+                .serviceConfiguration(serviceConfig)
+                .build();
 
         s3Service = new S3Service(s3Client, s3Presigner);
 
         s3Client.createBucket(
-            CreateBucketRequest.builder().bucket(TEST_BUCKET_NAME).build());
+                CreateBucketRequest.builder().bucket(TEST_BUCKET_NAME).build());
     }
 
     @Test
@@ -92,5 +96,42 @@ public class S3ServiceTest {
 
         Assertions.assertNotNull(presignedUrl);
         logger.info("Generated presigned URL: {}", presignedUrl);
+    }
+
+    @Test
+    public void testUploadObject() {
+        String bucketName = TEST_BUCKET_NAME;
+        String objectKey = TEST_OBJECT_KEY;
+
+        // Create a temporary test file
+        Path tempFilePath;
+        try {
+            tempFilePath = Files.createTempFile("test-file", ".txt");
+            Files.writeString(tempFilePath, "This is a test file");
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create a temporary test file", e);
+        }
+
+        // Ensure the test file exists
+        Assertions.assertTrue(Files.exists(tempFilePath), "Test file does not exist");
+
+        // Test successful upload
+        try {
+            s3Service.uploadObject(bucketName, objectKey, tempFilePath.toString());
+            logger.info("Successfully uploaded {} to bucket {}", objectKey, bucketName);
+        } catch (S3UploadException e) {
+            Assertions.fail("Upload should not have failed for a valid file", e);
+        }
+
+        // Test upload failure (e.g., invalid bucket)
+        try {
+            s3Service.uploadObject("invalid-bucket", objectKey, tempFilePath.toString());
+            Assertions.fail("Upload should have failed for an invalid bucket");
+        } catch (S3UploadException e) {
+            Assertions.assertEquals("Failed to upload to S3", e.getMessage());
+            logger.info("Correctly failed to upload to an invalid bucket");
+        }
+
+
     }
 }
