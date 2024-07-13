@@ -16,7 +16,8 @@ public class S3ClientConfig {
 
         return S3Client.builder()
                 .credentialsProvider(() -> null)
-                .region(Region.US_EAST_1).build();
+                .region(Region.US_EAST_1)
+                .build();
     }
 
     @Bean
