@@ -6,11 +6,11 @@ import static software.amazon.awssdk.http.SdkHttpConfigurationOption.TRUST_ALL_C
 import com.adobe.testing.s3mock.testcontainers.S3MockContainer;
 import java.net.URI;
 import java.util.List;
-
 import org.abx.virturalpet.service.S3Service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import software.amazon.awssdk.auth.credentials.AnonymousCredentialsProvider;
 import software.amazon.awssdk.http.urlconnection.UrlConnectionHttpClient;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3Configuration;
@@ -35,6 +35,7 @@ public class DeleteObjectTest {
                         .put(TRUST_ALL_CERTIFICATES, Boolean.TRUE)
                         .build());
         s3Client = S3Client.builder()
+                .credentialsProvider(AnonymousCredentialsProvider.create())
                 .endpointOverride(URI.create(endpoint))
                 .serviceConfiguration(serviceConfig)
                 .httpClient(httpClient)
