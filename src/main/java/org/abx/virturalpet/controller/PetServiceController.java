@@ -29,12 +29,7 @@ public class PetServiceController {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(PetServiceDto.builder()
-                .petId(petServiceDto.getPetId())
-                .petName(petServiceDto.getPetName())
-                .petType(petServiceDto.getPetType())
-                .petAge(petServiceDto.getPetAge())
-                .build());
+        return ResponseEntity.ok(petServiceDto);
     }
 
     @RequestMapping(value = "/pets/{pet_id}", method = RequestMethod.PUT)
@@ -45,12 +40,7 @@ public class PetServiceController {
         if (updatedPet == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(PetServiceDto.builder()
-                .petId(updatedPet.getPetId())
-                .petName(updatedPet.getPetName())
-                .petType(updatedPet.getPetType())
-                .petAge(updatedPet.getPetAge())
-                .build());
+        return ResponseEntity.ok(updatedPet);
     }
 
     @RequestMapping(value = "/pets/{pet_id}", method = RequestMethod.DELETE)

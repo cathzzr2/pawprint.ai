@@ -14,4 +14,3 @@ public interface UserDocRepository extends JpaRepository<UserDoc, UUID> {
 
     Optional<UserDoc> findByLastActive(java.sql.Timestamp lastActive);
 }
-
