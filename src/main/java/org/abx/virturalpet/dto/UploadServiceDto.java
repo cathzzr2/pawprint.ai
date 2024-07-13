@@ -15,6 +15,12 @@ public interface UploadServiceDto {
     @JsonProperty("user_id")
     String getUserId();
 
+    @JsonProperty("photo_id")
+    @Value.Default
+    default String getPhotoId() {
+        return "";
+    }
+
     @JsonProperty("timestamp")
     String getTimestamp();
 
