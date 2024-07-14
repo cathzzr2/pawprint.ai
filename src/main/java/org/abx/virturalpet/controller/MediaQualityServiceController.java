@@ -1,5 +1,6 @@
 package org.abx.virturalpet.controller;
 
+import java.util.UUID;
 import org.abx.virturalpet.dto.ImprovePhotoJbDto;
 import org.abx.virturalpet.dto.ImprovedPhotoResultDto;
 import org.abx.virturalpet.service.MediaQualityService;
@@ -8,8 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 @RestController
 public class MediaQualityServiceController {

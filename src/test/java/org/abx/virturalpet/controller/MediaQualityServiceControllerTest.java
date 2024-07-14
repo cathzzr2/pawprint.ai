@@ -1,6 +1,10 @@
 package org.abx.virturalpet.controller;
 
+import static org.mockito.Mockito.when;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.sql.Timestamp;
+import java.util.UUID;
 import org.abx.virturalpet.dto.ImprovePhotoJbDto;
 import org.abx.virturalpet.service.MediaQualityService;
 import org.junit.jupiter.api.Test;
@@ -13,11 +17,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
-import java.sql.Timestamp;
-import java.util.UUID;
-
-import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(MediaQualityServiceController.class)
