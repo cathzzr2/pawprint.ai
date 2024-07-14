@@ -1,6 +1,10 @@
 package org.abx.virturalpet.controller;
 
+import static org.mockito.Mockito.when;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.sql.Timestamp;
+import java.util.UUID;
 import org.abx.virturalpet.dto.ImprovePhotoJbDto;
 import org.abx.virturalpet.dto.ImprovedPhotoResultDto;
 import org.abx.virturalpet.service.MediaQualityService;
@@ -14,11 +18,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
-import java.sql.Timestamp;
-import java.util.UUID;
-
-import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(MediaQualityServiceController.class)
@@ -75,8 +74,7 @@ public class MediaQualityServiceControllerTest {
         UUID photoId = UUID.randomUUID();
         String jobType = "enhance";
 
-        when(mediaQualityService.enqueuePhoto(userId, photoId, jobType))
-                .thenReturn(null);
+        when(mediaQualityService.enqueuePhoto(userId, photoId, jobType)).thenReturn(null);
 
         String requestJsonPayload = String.format(
                 "{\"userId\":\"%s\",\"photoId\":\"%s\",\"jobType\":\"%s\"}",
@@ -131,8 +129,7 @@ public class MediaQualityServiceControllerTest {
 
         when(mediaQualityService.getImprovedPhoto(jobId)).thenReturn(null);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/results/{jobId}", jobId)
-                        .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(MockMvcRequestBuilders.get("/results/{jobId}", jobId).accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 }
