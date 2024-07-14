@@ -1,8 +1,5 @@
 package org.abx.virturalpet.service;
 
-import static org.mockito.Mockito.when;
-
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -32,25 +29,29 @@ public class UploadListObjectsServiceTest {
         HeadObjectResponse headObjectResponse =
                 HeadObjectResponse.builder().metadata(Map.of("key1", "value1")).build();
 
-        when(s3Client.listObjectsV2(Mockito.any(ListObjectsV2Request.class))).thenReturn(listObjectsV2Response);
-        when(s3Client.headObject(Mockito.any(HeadObjectRequest.class))).thenReturn(headObjectResponse);
+        Mockito.when(s3Client.listObjectsV2(Mockito.any(ListObjectsV2Request.class)))
+                .thenReturn(listObjectsV2Response);
+        Mockito.when(s3Client.headObject(Mockito.any(HeadObjectRequest.class))).thenReturn(headObjectResponse);
 
-        UploadServiceDto actualResult = uploadListObjectsService.listObject("test-bucket", "test-prefix");
+        List<UploadServiceDto> actualResults = uploadListObjectsService.listObjects("test-bucket", "test-prefix");
 
-        Assertions.assertNotNull(actualResult, "Actual result should not be null");
+        Assertions.assertNotNull(actualResults, "Actual result should not be null");
 
         UploadServiceDto expectedResult = ImmutableUploadServiceDto.builder()
                 .s3Key("test-key/test-file.txt")
                 .fileName("test-file.txt")
                 .userId("")
-                .photoId(actualResult.getPhotoId())
-                .timestamp(actualResult.getTimestamp())
+                .photoId(UUID.randomUUID().toString())
+                .timestamp("LocalDateTime.now().toString()")
                 .metadata("{key1=value1}")
                 .build();
 
-        Assertions.assertEquals(expectedResult.getS3Key(), actualResult.getS3Key());
-        Assertions.assertEquals(expectedResult.getFileName(), actualResult.getFileName());
-        Assertions.assertEquals(expectedResult.getMetadata(), actualResult.getMetadata());
+        Assertions.assertEquals(1, actualResults.size());
+        Assertions.assertEquals(expectedResult.getS3Key(), actualResults.get(0).getS3Key());
+        Assertions.assertEquals(
+                expectedResult.getFileName(), actualResults.get(0).getFileName());
+        Assertions.assertEquals(
+                expectedResult.getMetadata(), actualResults.get(0).getMetadata());
     }
 
     @Test
@@ -59,11 +60,12 @@ public class UploadListObjectsServiceTest {
                 .contents(Collections.emptyList())
                 .build();
 
-        when(s3Client.listObjectsV2(Mockito.any(ListObjectsV2Request.class))).thenReturn(listObjectsV2Response);
+        Mockito.when(s3Client.listObjectsV2(Mockito.any(ListObjectsV2Request.class)))
+                .thenReturn(listObjectsV2Response);
 
-        UploadServiceDto actualResult = uploadListObjectsService.listObject("test-bucket", "test-prefix");
+        List<UploadServiceDto> actualResults = uploadListObjectsService.listObjects("test-bucket", "test-prefix");
 
-        Assertions.assertNull(actualResult);
+        Assertions.assertTrue(actualResults.isEmpty());
     }
 
     @Test
@@ -74,15 +76,16 @@ public class UploadListObjectsServiceTest {
         HeadObjectResponse headObjectResponse =
                 HeadObjectResponse.builder().metadata(Map.of("key1", "value1")).build();
 
-        when(s3Client.listObjectsV2(Mockito.any(ListObjectsV2Request.class))).thenReturn(listObjectsV2Response);
-        when(s3Client.headObject(Mockito.any(HeadObjectRequest.class))).thenReturn(headObjectResponse);
+        Mockito.when(s3Client.listObjectsV2(Mockito.any(ListObjectsV2Request.class)))
+                .thenReturn(listObjectsV2Response);
+        Mockito.when(s3Client.headObject(Mockito.any(HeadObjectRequest.class))).thenReturn(headObjectResponse);
 
         UploadServiceDto expectedResult = ImmutableUploadServiceDto.builder()
                 .s3Key("test-key/test-file.txt")
                 .fileName("test-file.txt")
                 .userId("")
                 .photoId(UUID.randomUUID().toString()) // Replace with actual value
-                .timestamp(LocalDateTime.now().toString())
+                .timestamp("LocalDateTime.now().toString()")
                 .metadata("{key1=value1}")
                 .build();
 

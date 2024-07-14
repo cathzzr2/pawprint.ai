@@ -75,25 +75,30 @@ public class UploadServiceController {
     /**
      * controller for uploadService: list objects with Pagination
      */
-    @PostMapping("/media/upload/list-object")
-    public ResponseEntity<UploadServiceDto> listObject(@RequestBody ListObjectsRequestDto listObjectsRequestDto) {
-        UploadServiceDto res = uploadListObjectsService.listObject(
+    @PostMapping("/media/upload/list-objects")
+    public ResponseEntity<List<UploadServiceDto>> listObjects(
+            @RequestBody ListObjectsRequestDto listObjectsRequestDto) {
+        List<UploadServiceDto> results = uploadListObjectsService.listObjects(
                 listObjectsRequestDto.getBuckName(), listObjectsRequestDto.getPrefix());
-        if (res == null) {
+        if (results.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(ImmutableUploadServiceDto.builder()
-                .s3Key(res.getS3Key())
-                .fileName(res.getFileName())
-                .userId(res.getUserId())
-                .photoId(res.getPhotoId())
-                .timestamp(res.getTimestamp())
-                .metadata(res.getMetadata())
-                .build());
+        List<UploadServiceDto> immutableResults = results.stream()
+                .map(res -> ImmutableUploadServiceDto.builder()
+                        .s3Key(res.getS3Key())
+                        .fileName(res.getFileName())
+                        .userId(res.getUserId())
+                        .photoId(res.getPhotoId())
+                        .timestamp(res.getTimestamp())
+                        .metadata(res.getMetadata())
+                        .build())
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(immutableResults);
     }
 
-    @PostMapping("/media/upload/list-objects")
+    @PostMapping("/media/upload/list-objects-with-pagination")
     public ResponseEntity<List<UploadServiceDto>> listObjectsWithPagination(
             @RequestBody ListObjectsRequestDto listObjectsRequestDto) {
         List<UploadServiceDto> results = uploadListObjectsService.listObjectsWithPagination(

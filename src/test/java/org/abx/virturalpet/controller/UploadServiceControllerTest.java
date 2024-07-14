@@ -117,30 +117,31 @@ public class UploadServiceControllerTest {
     }
 
     @Test
-    public void testListObject() throws Exception {
-        when(uploadListObjectsService.listObject(
-                        listObjectsRequestDto.getBuckName(), listObjectsRequestDto.getPrefix()))
-                .thenReturn(uploadServiceDto);
+    public void testListObjects() throws Exception {
+        List<UploadServiceDto> uploadServiceDtos = Collections.singletonList(uploadServiceDto);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/media/upload/list-object")
+        when(uploadListObjectsService.listObjects(
+                        listObjectsRequestDto.getBuckName(), listObjectsRequestDto.getPrefix()))
+                .thenReturn(uploadServiceDtos);
+        mockMvc.perform(MockMvcRequestBuilders.post("/media/upload/list-objects")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(listObjectsRequestDto)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.s3_key").value("test-key"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.file_name").value("test-file"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.user_id").value("test-user"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.photo_id").value("test-photo"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value("2023-07-01T12:00:00"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.metadata").value("test-metadata"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].s3_key").value("test-key"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].file_name").value("test-file"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].user_id").value("test-user"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].photo_id").value("test-photo"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].timestamp").value("2023-07-01T12:00:00"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].metadata").value("test-metadata"));
     }
 
     @Test
     public void testListObjects_NotFound() throws Exception {
-        when(uploadListObjectsService.listObject(
+        when(uploadListObjectsService.listObjects(
                         listObjectsRequestDto.getBuckName(), listObjectsRequestDto.getPrefix()))
-                .thenReturn(null);
+                .thenReturn(Collections.emptyList());
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/media/upload/list-object")
+        mockMvc.perform(MockMvcRequestBuilders.post("/media/upload/list-objects")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(listObjectsRequestDto)))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
@@ -157,7 +158,7 @@ public class UploadServiceControllerTest {
                         listObjectsRequestDto.getLimit()))
                 .thenReturn(uploadServiceDtos);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/media/upload/list-objects")
+        mockMvc.perform(MockMvcRequestBuilders.post("/media/upload/list-objects-with-pagination")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(listObjectsRequestDto)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -178,7 +179,7 @@ public class UploadServiceControllerTest {
                         listObjectsRequestDto.getLimit()))
                 .thenReturn(Collections.emptyList());
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/media/upload/list-objects")
+        mockMvc.perform(MockMvcRequestBuilders.post("/media/upload/list-objects-with-pagination")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(listObjectsRequestDto)))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());

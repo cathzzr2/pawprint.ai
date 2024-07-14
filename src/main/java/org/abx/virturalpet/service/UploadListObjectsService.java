@@ -27,19 +27,17 @@ public class UploadListObjectsService {
         this.s3Client = s3Client;
     }
 
-    public UploadServiceDto listObject(String bucketName, String prefix) {
-        ListObjectsV2Request listObjectsV2Request = ListObjectsV2Request.builder()
-                .bucket(bucketName)
-                .prefix(prefix)
-                .maxKeys(1) // only get one object
-                .build();
+    public List<UploadServiceDto> listObjects(String bucketName, String prefix) {
+        ListObjectsV2Request listObjectsV2Request =
+                ListObjectsV2Request.builder().bucket(bucketName).prefix(prefix).build();
 
         ListObjectsV2Response listObjectsV2Response;
         try {
             listObjectsV2Response = s3Client.listObjectsV2(listObjectsV2Request);
         } catch (S3Exception e) {
             logger.error("Error listing objects in bucket {} with prefix {}", bucketName, prefix, e);
-            return null;
+            throw new RuntimeException(
+                    String.format("Error listing objects in bucket %s with prefix %s", bucketName, prefix), e);
         }
 
         return listObjectsV2Response.contents().stream()
@@ -57,8 +55,7 @@ public class UploadListObjectsService {
                             .metadata(metadata.toString())
                             .build();
                 })
-                .findFirst()
-                .orElse(null);
+                .collect(Collectors.toList());
     }
 
     public List<UploadServiceDto> listObjectsWithPagination(String bucketName, String prefix, int offset, int limit) {
@@ -73,7 +70,8 @@ public class UploadListObjectsService {
             listObjectsV2Response = s3Client.listObjectsV2(listObjectsV2Request);
         } catch (S3Exception e) {
             logger.error("Error listing objects in bucket {} with prefix {}", bucketName, prefix, e);
-            return List.of();
+            throw new RuntimeException(
+                    String.format("Error listing objects in bucket %s with prefix %s", bucketName, prefix), e);
         }
 
         return listObjectsV2Response.contents().stream()
@@ -111,7 +109,8 @@ public class UploadListObjectsService {
             return headObjectResponse.metadata();
         } catch (S3Exception e) {
             logger.error("Error getting metadata for object {} in bucket {}", key, bucketName, e);
-            return Map.of(); // return null
+            throw new RuntimeException(
+                    String.format("Error getting metadata for object {} in bucket {}", key, bucketName, e));
         }
     }
 }
