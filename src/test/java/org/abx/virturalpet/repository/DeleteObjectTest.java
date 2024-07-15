@@ -58,7 +58,7 @@ public class DeleteObjectTest {
                         StaticCredentialsProvider.create(AwsBasicCredentials.create("dummy-key", "dummy-secret")))
                 .serviceConfiguration(serviceConfig)
                 .build();
-        s3Service = new S3Service(s3Client);
+        s3Service = new S3Service(s3Client, null);
 
         try {
             CreateBucketRequest createBucketRequest =
