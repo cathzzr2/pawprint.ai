@@ -52,6 +52,12 @@ dependencies {
     testImplementation("com.h2database:h2")
     testImplementation("org.awaitility:awaitility:3.0.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    // S3Mock
+    testImplementation("software.amazon.awssdk:url-connection-client:2.17+")
+    testImplementation("com.adobe.testing:s3mock:3.3.0")
+    testImplementation("com.adobe.testing:s3mock-testcontainers:3.3.0")
+    testImplementation("org.testcontainers:junit-jupiter:1.19.0")
 }
 
 tasks.withType<Test> {
