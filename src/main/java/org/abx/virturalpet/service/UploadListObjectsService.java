@@ -3,7 +3,6 @@ package org.abx.virturalpet.service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import org.abx.virturalpet.dto.ImmutableUploadServiceDto;
 import org.abx.virturalpet.dto.UploadServiceDto;
@@ -52,7 +51,8 @@ public class UploadListObjectsService {
                             .s3Key(key)
                             .fileName(fileName)
                             .userId("") // repalce with photoModel.getUserId()
-                            .photoId(UUID.randomUUID().toString()) // repalce with photoModel.getPhotoID()
+                            //                            .photoId(UUID.randomUUID().toString()) // repalce with
+                            // photoModel.getPhotoID()
                             .timestamp(LocalDateTime.now().toString()) // repalce with photoModel.getUploadTime()
                             .metadata(metadata.toString())
                             .build();
@@ -86,7 +86,8 @@ public class UploadListObjectsService {
                             .s3Key(key)
                             .fileName(fileName)
                             .userId("") // repalce with photoModel.getUserId()
-                            .photoId(UUID.randomUUID().toString()) // repalce with photoModel.getPhotoID()
+                            //                            .photoId(UUID.randomUUID().toString()) // repalce with
+                            // photoModel.getPhotoID()
                             .timestamp(LocalDateTime.now().toString()) // repalce with photoModel.getUploadTime()
                             .metadata(metadata.toString())
                             .build();

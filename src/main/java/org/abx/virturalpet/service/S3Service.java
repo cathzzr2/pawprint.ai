@@ -6,11 +6,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.abx.virturalpet.exception.S3DeletionException;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.Delete;
+import software.amazon.awssdk.services.s3.model.DeleteObjectsRequest;
+import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
@@ -101,9 +105,45 @@ public class S3Service {
     // reference:
     // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javav2/example_code/s3/src/main/java/com/example/s3/DeleteObjects.java
     // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javav2/example_code/s3/src/main/java/com/example/s3/DeleteMultiObjects.java
-    public void deleteObject(String bucketName, String objectKey) {}
+    public void deleteObject(String bucketName, String objectKey) {
+        ObjectIdentifier toDelete = ObjectIdentifier.builder().key(objectKey).build();
 
-    public void deleteObjects(String bucketName, String... objectKeys) {}
+        try {
+            DeleteObjectsRequest dor = DeleteObjectsRequest.builder()
+                    .bucket(bucketName)
+                    .delete(Delete.builder().objects(toDelete).build())
+                    .build();
+
+            s3Client.deleteObjects(dor);
+
+        } catch (S3Exception e) {
+            logger.error(
+                    "S3Exception while deleting object: {}", e.awsErrorDetails().errorMessage());
+            throw new S3DeletionException(e.awsErrorDetails().errorMessage());
+        }
+    }
+
+    public void deleteObjects(String bucketName, String... objectKeys) {
+        List<ObjectIdentifier> toDelete = new ArrayList<>();
+        for (String objectKey : objectKeys) {
+            toDelete.add(ObjectIdentifier.builder().key(objectKey).build());
+        }
+
+        try {
+            DeleteObjectsRequest dor = DeleteObjectsRequest.builder()
+                    .bucket(bucketName)
+                    .delete(Delete.builder().objects(toDelete).build())
+                    .build();
+
+            s3Client.deleteObjects(dor);
+
+        } catch (S3Exception e) {
+            logger.error(
+                    "S3Exception while deleting objects: {}",
+                    e.awsErrorDetails().errorMessage());
+            throw new S3DeletionException(e.awsErrorDetails().errorMessage());
+        }
+    }
 
     // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javav2/example_code/s3/src/main/java/com/example/s3/ListObjects.java
     // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javav2/example_code/s3/src/main/java/com/example/s3/ListObjectsPaginated.java

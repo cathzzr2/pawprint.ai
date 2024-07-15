@@ -23,9 +23,10 @@ public class ChatServiceTest {
         chatService.sendMessage(sendMessageDto);
 
         Mockito.verify(messageRepository)
-                .save(ArgumentMatchers.argThat(savedModel -> savedModel.getUserId().equals(sendMessageDto.getUserId())
-                        && savedModel.getThreadId().equals(sendMessageDto.getThreadId())
-                        && savedModel.getMessage().equals(sendMessageDto.getMessageContent())));
+                .save(ArgumentMatchers.argThat(
+                        savedModel -> savedModel.getUserId().equals(sendMessageDto.getUserId())
+                                && savedModel.getThreadId().equals(sendMessageDto.getThreadId())
+                                && savedModel.getMessage().equals(sendMessageDto.getMessageContent())));
     }
 
     @Test
