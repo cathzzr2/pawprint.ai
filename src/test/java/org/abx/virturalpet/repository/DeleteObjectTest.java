@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import software.amazon.awssdk.auth.credentials.AnonymousCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.http.SdkHttpConfigurationOption;
 import software.amazon.awssdk.http.urlconnection.UrlConnectionHttpClient;
@@ -42,7 +44,8 @@ public class DeleteObjectTest {
                         .put(SdkHttpConfigurationOption.TRUST_ALL_CERTIFICATES, Boolean.TRUE)
                         .build());
         s3Client = S3Client.builder()
-                .credentialsProvider(AnonymousCredentialsProvider.create())
+                .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(
+                        "dummy-key", "dummy-secret")))
                 .endpointOverride(URI.create(endpoint))
                 .serviceConfiguration(serviceConfig)
                 .httpClient(httpClient)
