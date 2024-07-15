@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.abx.virturalpet.exception.S3DeletionException;
-import org.abx.virturalpet.exception.S3DeleteException;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -118,7 +117,8 @@ public class S3Service {
             s3Client.deleteObjects(dor);
 
         } catch (S3Exception e) {
-            logger.error("S3Exception while deleting object: {}", e.awsErrorDetails().errorMessage());
+            logger.error(
+                    "S3Exception while deleting object: {}", e.awsErrorDetails().errorMessage());
             throw new S3DeletionException(e.awsErrorDetails().errorMessage());
         }
     }
@@ -138,7 +138,9 @@ public class S3Service {
             s3Client.deleteObjects(dor);
 
         } catch (S3Exception e) {
-            logger.error("S3Exception while deleting objects: {}", e.awsErrorDetails().errorMessage());
+            logger.error(
+                    "S3Exception while deleting objects: {}",
+                    e.awsErrorDetails().errorMessage());
             throw new S3DeletionException(e.awsErrorDetails().errorMessage());
         }
     }
