@@ -1,11 +1,10 @@
 package org.abx.virturalpet.repository;
 
+import java.util.List;
+import java.util.UUID;
 import org.abx.virturalpet.model.JobProgress;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
-
-import java.util.List;
-import java.util.UUID;
 
 /**
  * Repository interface for accessing PhotoMetadata documents in MongoDB.
