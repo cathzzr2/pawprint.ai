@@ -3,6 +3,7 @@ package org.abx.virturalpet.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.util.UUID;
 import org.immutables.value.Value;
 
 @Value.Immutable
@@ -11,14 +12,14 @@ import org.immutables.value.Value;
 public interface SendMessageDto {
     @JsonProperty("user_id")
     @Value.Default
-    default int getUserId() {
-        return 0;
+    default UUID getUserId() {
+        return UUID.randomUUID();
     }
 
     @JsonProperty("thread_id")
     @Value.Default
-    default int getThreadId() {
-        return 0;
+    default UUID getThreadId() {
+        return UUID.randomUUID();
     }
 
     @JsonProperty("message_content")
@@ -27,10 +28,10 @@ public interface SendMessageDto {
         return "";
     }
 
-    @JsonProperty("message_id")
+    @JsonProperty("timestamp")
     @Value.Default
-    default int getMessageId() {
-        return 0;
+    default String getTimestamp() {
+        return "";
     }
 
     @JsonProperty("status_code")

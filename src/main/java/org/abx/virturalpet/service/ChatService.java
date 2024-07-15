@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.UUID;
 import org.abx.virturalpet.dto.ImmutableSendMessageDto;
 import org.abx.virturalpet.dto.SendMessageDto;
+import org.abx.virturalpet.model.MessageModel;
+import org.abx.virturalpet.repository.MessageRepository;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,7 +15,11 @@ public class ChatService {
     private static final String MESSAGE_SENT_SUCCESSFULLY = "Message Sent Successfully";
     private static final String MESSAGE_RECEIVED_SUCCESSFULLY = "Message Received Successfully";
 
-    private final List<SendMessageDto> messages = new ArrayList<>();
+    private final MessageRepository messageRepository;
+
+    public ChatService(MessageRepository messageRepository) {
+        this.messageRepository = messageRepository;
+    }
 
     public SendMessageDto sendMessage(SendMessageDto sendMessageDto) {
         if (sendMessageDto.getMessageContent() == null
@@ -24,25 +30,24 @@ public class ChatService {
                     .build();
         }
 
-        int messageId = UUID.randomUUID().hashCode();
         SendMessageDto newMessage = ImmutableSendMessageDto.builder()
                 .from(sendMessageDto)
-                .messageId(messageId)
                 .status("Sent")
                 .statusCode(0)
                 .build();
 
-        messages.add(newMessage);
+        MessageModel messageModel = fromMessageDto(newMessage);
+
+        messageRepository.save(messageModel);
 
         return ImmutableSendMessageDto.builder()
-                .messageId(messageId)
                 .status(MESSAGE_SENT_SUCCESSFULLY)
                 .statusCode(0)
                 .build();
     }
 
-    public List<SendMessageDto> fetchMessages(int userId) {
-        if (userId <= 0) {
+    public List<SendMessageDto> fetchMessagesByUserId(UUID userId) {
+        if (userId == null) {
             List<SendMessageDto> errorResponse = new ArrayList<>();
             errorResponse.add(ImmutableSendMessageDto.builder()
                     .statusCode(1)
@@ -51,13 +56,49 @@ public class ChatService {
             return errorResponse;
         }
 
-        List<SendMessageDto> userMessages = new ArrayList<>();
-        for (SendMessageDto message : messages) {
-            if (message.getUserId() == userId) {
-                userMessages.add(message);
-            }
+        List<MessageModel> userMessages = messageRepository.findByUserId(userId);
+        List<SendMessageDto> userMessagesDto = new ArrayList<>();
+        for (MessageModel messageModel : userMessages) {
+            userMessagesDto.add(fromMessageModel(messageModel));
         }
 
-        return userMessages;
+        return userMessagesDto;
     }
+
+    public List<SendMessageDto> fetchMessagesByThreadId(UUID threadId) {
+        if (threadId == null) {
+            List<SendMessageDto> errorResponse = new ArrayList<>();
+            errorResponse.add(ImmutableSendMessageDto.builder()
+                    .statusCode(1)
+                    .status("Thread not found")
+                    .build());
+            return errorResponse;
+        }
+
+        List<MessageModel> threadMessages = messageRepository.findByThreadId(threadId);
+        List<SendMessageDto> threadMessagesDto = new ArrayList<>();
+        for (MessageModel messageModel : threadMessages) {
+            threadMessagesDto.add(fromMessageModel(messageModel));
+        }
+
+        return threadMessagesDto;
+    }
+
+    public SendMessageDto fromMessageModel(MessageModel messageModel) {
+        return ImmutableSendMessageDto.builder()
+                .userId(messageModel.getUserId())
+                .threadId(messageModel.getThreadId())
+                .messageContent(messageModel.getMessage())
+                .timestamp(messageModel.getTimestamp().toString())
+                .build();
+    }
+
+    public MessageModel fromMessageDto(SendMessageDto sendMessageDto) {
+        MessageModel messageModel = new MessageModel();
+        messageModel.setUserId(sendMessageDto.getUserId());
+        messageModel.setThreadId(sendMessageDto.getThreadId());
+        messageModel.setMessage(sendMessageDto.getMessageContent());
+        return messageModel;
+    }
+
 }
