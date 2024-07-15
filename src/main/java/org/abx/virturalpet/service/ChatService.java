@@ -100,5 +100,4 @@ public class ChatService {
         messageModel.setMessage(sendMessageDto.getMessageContent());
         return messageModel;
     }
-
 }

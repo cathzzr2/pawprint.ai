@@ -57,7 +57,6 @@ public class ChatServiceControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value("2021-09-01T12:00:00"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status").value("Sent"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status_code").value(0));
-
     }
 
     @Test
@@ -78,11 +77,11 @@ public class ChatServiceControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].user_id").value(userId.toString()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].thread_id").isNotEmpty())
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].message_content").value("Hello, how are you?"))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$[0].message_content").value("Hello, how are you?"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].timestamp").value("2021-09-01T12:00:00"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].status_code").value(0))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].status").value("Success"));
-
     }
 
     @Test
@@ -103,7 +102,8 @@ public class ChatServiceControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].user_id").value(userId.toString()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].thread_id").isNotEmpty())
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].message_content").value("Hello, how are you?"))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$[0].message_content").value("Hello, how are you?"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].timestamp").value("2021-09-01T12:00:00"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].status_code").value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].status").value("Failed"));
@@ -127,11 +127,11 @@ public class ChatServiceControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].user_id").isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].thread_id").value(threadId.toString()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].message_content").value("Hello, how are you?"))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$[0].message_content").value("Hello, how are you?"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].timestamp").value("2021-09-01T12:00:00"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].status_code").value(0))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].status").value("Success"));
-
     }
 
     @Test
@@ -152,7 +152,8 @@ public class ChatServiceControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].user_id").isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].thread_id").value(threadId.toString()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].message_content").value("Hello, how are you?"))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$[0].message_content").value("Hello, how are you?"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].timestamp").value("2021-09-01T12:00:00"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].status_code").value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].status").value("Failed"));
