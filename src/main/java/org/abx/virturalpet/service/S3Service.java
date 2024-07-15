@@ -136,6 +136,7 @@ public class S3Service {
             s3Client.deleteObjects(dor);
 
         } catch (S3Exception e) {
+            logger.error("S3Exception while deleting objects: {}", e.awsErrorDetails().errorMessage());
             throw new S3DeletionException(e.awsErrorDetails().errorMessage());
         }
     }
