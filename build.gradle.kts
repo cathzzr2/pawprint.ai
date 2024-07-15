@@ -55,8 +55,10 @@ dependencies {
 
     // S3Mock
     testImplementation("software.amazon.awssdk:url-connection-client:2.17+")
-    testImplementation("com.adobe.testing:s3mock:3.3.0")
-    testImplementation("com.adobe.testing:s3mock-testcontainers:3.3.0")
+    testImplementation("com.adobe.testing:s3mock:3.9.1")
+    testImplementation("com.adobe.testing:s3mock-testcontainers:3.9.1")
+    testImplementation("com.adobe.testing:s3mock-junit5:2.0.2")
+
     testImplementation("org.testcontainers:junit-jupiter:1.19.0")
 }
 
