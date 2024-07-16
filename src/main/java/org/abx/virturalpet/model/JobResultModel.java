@@ -76,4 +76,48 @@ public class JobResultModel {
     public void setS3Key(String s3Key) {
         this.s3Key = s3Key;
     }
+    public static final class Builder {
+        private UUID resultId;
+        private UUID userId;
+        private UUID jobId;
+        private Timestamp generatedTime;
+        private String s3Key;
+
+        private Builder() {
+        }
+
+        public static Builder newBuilder() {
+            return new Builder();
+        }
+
+        public Builder withResultId(UUID resultId) {
+            this.resultId = resultId;
+            return this;
+        }
+
+        public Builder withUserId(UUID userId) {
+            this.userId = userId;
+            return this;
+        }
+
+        public Builder withJobId(UUID jobId) {
+            this.jobId = jobId;
+            return this;
+        }
+
+        public Builder withGeneratedTime(Timestamp generatedTime) {
+            this.generatedTime = generatedTime;
+            return this;
+        }
+
+        public Builder withS3Key(String s3Key) {
+            this.s3Key = s3Key;
+            return this;
+        }
+
+        public JobResultModel build() {
+            return new JobResultModel(resultId, userId, jobId, generatedTime, s3Key);
+        }
+    }
+
 }

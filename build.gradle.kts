@@ -4,7 +4,16 @@ plugins {
     id("org.springframework.boot") version "3.3.0"
     id("io.spring.dependency-management") version "1.1.5"
     id("com.diffplug.spotless") version "6.18.0"
-    id("org.flywaydb.flyway") version "7.15.0"
+    id("org.flywaydb.flyway") version "10.15.2"
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.flywaydb:flyway-database-postgresql:10.1.0")
+    }
 }
 
 group = "org.abx"
