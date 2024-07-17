@@ -1,10 +1,6 @@
 package org.abx.virturalpet.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.adobe.testing.s3mock.testcontainers.S3MockContainer;
-import java.net.URI;
-import java.util.List;
 import org.abx.virturalpet.configuration.S3MockConfig;
 import org.abx.virturalpet.exception.S3DeleteException;
 import org.abx.virturalpet.service.S3Service;
@@ -28,6 +24,11 @@ import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.utils.AttributeMap;
 
+import java.net.URI;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 @Testcontainers
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = S3MockConfig.class)
@@ -35,6 +36,7 @@ public class DeleteObjectTest {
     private final Logger logger = LoggerFactory.getLogger(DeleteObjectTest.class);
     private final String testBucketName = "test-bucket";
     private final String testObjectKey = "test-object-key";
+    private final String filePath = "test-file-path";
     private final S3MockContainer s3MockContainer = new S3MockContainer("latest");
     private S3Client s3Client;
     private S3Service s3Service;
@@ -75,7 +77,7 @@ public class DeleteObjectTest {
     @Test
     public void deleteObject() {
         s3Service.deleteObject(testBucketName, testObjectKey);
-        var deletedObject = s3Service.getObject(testBucketName, testObjectKey);
+        var deletedObject = s3Service.getObject(testBucketName, testObjectKey, filePath);
         assertThat(deletedObject).isNull();
     }
 
@@ -92,7 +94,7 @@ public class DeleteObjectTest {
     @Test
     public void deleteObjects() {
         s3Service.deleteObjects(testBucketName, String.valueOf(List.of(testObjectKey)));
-        var deletedObject = s3Service.getObject(testBucketName, testObjectKey);
+        var deletedObject = s3Service.getObject(testBucketName, testObjectKey, filePath);
         assertThat(deletedObject).isNull();
     }
 }

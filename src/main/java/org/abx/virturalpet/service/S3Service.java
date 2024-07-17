@@ -1,11 +1,5 @@
 package org.abx.virturalpet.service;
 
-import java.io.File;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.abx.virturalpet.exception.S3DeletionException;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +8,23 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.Delete;
 import software.amazon.awssdk.services.s3.model.DeleteObjectsRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class S3Service {
@@ -98,8 +103,32 @@ public class S3Service {
 
     // reference:
     // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javav2/example_code/s3/src/main/java/com/example/s3/GetObjectData.java
-    public Object getObject(String bucketName, String objectKey) {
-        return null;
+    public String getObject(String bucketName, String objectKey, String filePath) {
+        try {
+            GetObjectRequest objectRequest =
+                    GetObjectRequest.builder().key(objectKey).bucket(bucketName).build();
+
+            byte[] data = s3Client.getObjectAsBytes(objectRequest).asByteArray();
+
+            try (OutputStream os = new FileOutputStream(new File(filePath))) {
+                os.write(data);
+            }
+
+            logger.info("Successfully obtained bytes from an S3 object");
+            return filePath;
+        } catch (IOException ex) {
+            logger.error("IOException occurred while writing to file: {}", filePath, ex);
+        } catch (S3Exception e) {
+            logger.error("S3Exception occurred while getting object {} from bucket {}", objectKey, bucketName, e);
+            throw new GetException("Failed to get " + objectKey + " from bucket " + bucketName, e);
+        }
+        return "";
+    }
+
+    public class GetException extends RuntimeException {
+        public GetException(String message, Throwable cause) {
+            super(message, cause);
+        }
     }
 
     // reference:
