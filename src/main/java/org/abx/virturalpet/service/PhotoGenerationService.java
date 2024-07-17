@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Timestamp;
+import java.util.Optional;
 import java.util.UUID;
 import org.abx.virturalpet.dto.ImageGenSqsDto;
 import org.abx.virturalpet.dto.ImmutableImageGenSqsDto;
@@ -14,9 +15,11 @@ import org.abx.virturalpet.dto.PhotoGenerationDto;
 import org.abx.virturalpet.model.JobProgress;
 import org.abx.virturalpet.model.JobResultModel;
 import org.abx.virturalpet.model.PhotoJobModel;
+import org.abx.virturalpet.model.PhotoModel;
 import org.abx.virturalpet.repository.JobProgressRepository;
 import org.abx.virturalpet.repository.JobResultRepository;
 import org.abx.virturalpet.repository.PhotoJobRepository;
+import org.abx.virturalpet.repository.PhotoRepository;
 import org.abx.virturalpet.sqs.ImageGenSqsProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +43,7 @@ public class PhotoGenerationService {
     private final JobResultRepository jobResultRepository;
     private final PhotoJobRepository photoJobRepository;
     private final JobProgressRepository jobProgressRepository;
+    private final PhotoRepository photoRepository;
 
     public PhotoGenerationService(
             S3Client s3Client,
@@ -49,33 +53,37 @@ public class PhotoGenerationService {
             ImageGenSqsProducer imageGenSqsProducer,
             JobResultRepository jobResultRepository,
             PhotoJobRepository photoJobRepository,
-            JobProgressRepository jobProgressRepository) {
+            JobProgressRepository jobProgressRepository,
+            PhotoRepository photoRepository) {
         this.s3Client = s3Client;
         this.sqsClient = sqsClient;
         this.queueUrl = queueUrl;
         this.bucketName = bucketName;
+        this.photoRepository = photoRepository;
         this.imageGenSqsProducer = imageGenSqsProducer;
         this.jobResultRepository = jobResultRepository;
         this.photoJobRepository = photoJobRepository;
         this.jobProgressRepository = jobProgressRepository;
     }
 
-    public PhotoGenerationDto generateImg(String imageData, String userIdStr, String jobType) {
+    public PhotoGenerationDto generateImg(String imageData, String photoIdStr, String jobType) {
         if (imageData == null || imageData.isEmpty()) {
             throw new IllegalArgumentException("Image data cannot be null or empty");
         }
 
-        UUID userId = UUID.fromString(userIdStr);
-
-        // TODO: get s3key from photoRepo when it is available
-        String s3Key = "path/to/photo";
-
-        // TODO: get imageId from photoRepo when it is available
-        UUID photoId = UUID.randomUUID();
-        UUID jobId = UUID.randomUUID();
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        // get photoModel from photoRepo
+        UUID photoId = UUID.fromString(photoIdStr);
+        Optional<PhotoModel> optionalPhotoModel = photoRepository.findByPhotoId(photoId);
+        if (!optionalPhotoModel.isPresent()) {
+            throw new RuntimeException("Photo not found for id: " + photoIdStr);
+        }
+        PhotoModel photoModel = optionalPhotoModel.get();
 
         // Save job info in jobRepo
+        UUID userId = photoModel.getUserId(); // get userId from photoModel
+        String userIdStr = userId.toString();
+        UUID jobId = UUID.randomUUID();
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         PhotoJobModel photoJobModel = PhotoJobModel.newBuilder()
                 .withJobId(jobId)
                 .withPhotoId(photoId)
@@ -109,19 +117,17 @@ public class PhotoGenerationService {
                 .build();
     }
 
-    public Path fetchPhotoFromS3(String photoId) throws IOException {
+    public Path fetchPhotoFromS3(String s3Key) throws IOException {
         Path tempFile = null;
         try {
-            // TODO: get s3Key from photoRepo
-            String s3Key = photoId;
             tempFile = Files.createTempFile("s3_", "_" + s3Key);
 
-            // 从 S3 获取对象
+            // Fetch object from S3
             GetObjectRequest getObjectRequest =
                     GetObjectRequest.builder().bucket(bucketName).key(s3Key).build();
             ResponseInputStream<GetObjectResponse> s3Object = s3Client.getObject(getObjectRequest);
 
-            // 将 s3Object 写入 tempFile
+            // Write s3Object to tempFile
             try (InputStream inputStream = s3Object;
                     FileOutputStream outputStream = new FileOutputStream(tempFile.toFile())) {
                 byte[] buffer = new byte[1024];
@@ -149,12 +155,11 @@ public class PhotoGenerationService {
         if (jobId == null || jobId.isEmpty()) {
             throw new IllegalArgumentException("jobId cannot be null or empty");
         }
-
+        // get job status from mongoDb(jobProgressRepo)
         JobProgress jobProgress = jobProgressRepository.findByJobId(UUID.fromString(jobId));
         if (jobProgress == null) {
             throw new RuntimeException("Job with ID " + jobId + " not found");
         }
-
         String jobStatus = jobProgress.getJobStatus();
         return ImmutablePhotoGenerationDto.builder().status(jobStatus).build();
     }
@@ -164,7 +169,7 @@ public class PhotoGenerationService {
             throw new IllegalArgumentException("imageId cannot be null or empty");
         }
 
-        // 从 jobResultRepository 获取 jobResultModel
+        // get jobResult from jobResultRepo
         JobResultModel jobResult = jobResultRepository.findByJobId(UUID.fromString(imageId));
         if (jobResult == null) {
             throw new IllegalArgumentException("Generated photo not found");

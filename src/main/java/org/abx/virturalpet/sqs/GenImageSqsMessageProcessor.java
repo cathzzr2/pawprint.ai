@@ -3,15 +3,18 @@ package org.abx.virturalpet.sqs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.file.Path;
 import java.sql.Timestamp;
+import java.util.Optional;
 import java.util.UUID;
 import org.abx.virturalpet.dto.ImageGenSqsDto;
 import org.abx.virturalpet.exception.SqsProducerException;
 import org.abx.virturalpet.model.JobProgress;
 import org.abx.virturalpet.model.JobResultModel;
 import org.abx.virturalpet.model.PhotoJobModel;
+import org.abx.virturalpet.model.PhotoModel;
 import org.abx.virturalpet.repository.JobProgressRepository;
 import org.abx.virturalpet.repository.JobResultRepository;
 import org.abx.virturalpet.repository.PhotoJobRepository;
+import org.abx.virturalpet.repository.PhotoRepository;
 import org.abx.virturalpet.service.PhotoGenerationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +26,7 @@ public class GenImageSqsMessageProcessor implements MessageProcessor {
     private static final Logger logger = LoggerFactory.getLogger(GenImageSqsMessageProcessor.class);
 
     private final PhotoGenerationService photoGenerationService;
+    private final PhotoRepository photoRepository;
     private final JobProgressRepository jobRepository;
     private final JobResultRepository resultRepository;
     private final PhotoJobRepository photoJobRepository;
@@ -32,11 +36,13 @@ public class GenImageSqsMessageProcessor implements MessageProcessor {
             PhotoGenerationService photoGenerationService,
             JobProgressRepository jobRepository,
             PhotoJobRepository photoJobRepository,
-            JobResultRepository resultRepository) {
+            JobResultRepository resultRepository,
+            PhotoRepository photoRepository) {
         this.photoGenerationService = photoGenerationService;
         this.jobRepository = jobRepository;
         this.photoJobRepository = photoJobRepository;
         this.resultRepository = resultRepository;
+        this.photoRepository = photoRepository;
     }
 
     @Override
@@ -45,16 +51,24 @@ public class GenImageSqsMessageProcessor implements MessageProcessor {
             String messageBody = message.body();
             ImageGenSqsDto sqsDto = objectMapper.readValue(messageBody, ImageGenSqsDto.class);
 
+            // getS3key from photoRepo
+            String photoIdStr = sqsDto.photoId();
+            UUID photoId = UUID.fromString(sqsDto.photoId());
+            Optional<PhotoModel> optionalPhotoModel = photoRepository.findByPhotoId(photoId);
+            if (!optionalPhotoModel.isPresent()) {
+                throw new RuntimeException("Photo not found for id: " + photoIdStr);
+            }
+            PhotoModel photoModel = optionalPhotoModel.get();
+            String s3Key = photoModel.getS3Key();
+
             // Fetch photoData from s3Key in photoRepo
             Path photoData = photoGenerationService.fetchPhotoFromS3(sqsDto.photoId());
-            String photoIdStr = sqsDto.photoId();
             String jobId = sqsDto.getJobId();
 
             // Call external API
             String apiResponse = photoGenerationService.callExternalApi(jobId, photoIdStr, photoData.toString());
 
-            // Fetch job info from PhotoJobRepo
-            UUID photoId = UUID.fromString(photoIdStr);
+            // Fetch job info from PhotoJobRepo;
             PhotoJobModel photoJobModel = photoJobRepository.findByPhotoId(photoId);
             if (photoJobModel == null) {
                 throw new SqsProducerException("Job not found for Photo ID " + photoIdStr);

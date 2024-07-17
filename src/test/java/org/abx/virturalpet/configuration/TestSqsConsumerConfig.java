@@ -3,6 +3,7 @@ package org.abx.virturalpet.configuration;
 import org.abx.virturalpet.repository.JobProgressRepository;
 import org.abx.virturalpet.repository.JobResultRepository;
 import org.abx.virturalpet.repository.PhotoJobRepository;
+import org.abx.virturalpet.repository.PhotoRepository;
 import org.abx.virturalpet.service.PhotoGenerationService;
 import org.abx.virturalpet.sqs.GenImageSqsMessageProcessor;
 import org.abx.virturalpet.sqs.MessageProcessor;
@@ -19,9 +20,10 @@ public class TestSqsConsumerConfig {
             PhotoGenerationService photoGenerationService,
             JobProgressRepository jobRepository,
             PhotoJobRepository photoJobRepository,
-            JobResultRepository resultRepository) {
+            JobResultRepository resultRepository,
+            PhotoRepository photoRepository) {
         return new GenImageSqsMessageProcessor(
-                photoGenerationService, jobRepository, photoJobRepository, resultRepository);
+                photoGenerationService, jobRepository, photoJobRepository, resultRepository, photoRepository);
     }
 
     @Bean
