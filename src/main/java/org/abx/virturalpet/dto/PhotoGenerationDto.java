@@ -28,10 +28,22 @@ public interface PhotoGenerationDto extends Serializable {
         return "";
     }
 
-    @JsonProperty("completed")
+    @JsonProperty("jb_status")
     @Value.Default
-    default boolean getCompleted() {
-        return false;
+    default String getStatus() {
+        return "";
+    }
+
+    @JsonProperty("user_id")
+    @Value.Default
+    default String getUserId() {
+        return "";
+    }
+
+    @JsonProperty("job_type")
+    @Value.Default
+    default String getJobType() {
+        return "";
     }
 
     static ImmutablePhotoGenerationDto.Builder builder() {

@@ -76,4 +76,55 @@ public class PhotoJobModel {
     public void setJobSubmissionTime(Timestamp jobSubmissionTime) {
         this.jobSubmissionTime = jobSubmissionTime;
     }
+
+    private PhotoJobModel(Builder builder) {
+        jobId = builder.jobId;
+        photoId = builder.photoId;
+        userId = builder.userId;
+        jobType = builder.jobType;
+        jobSubmissionTime = builder.jobSubmissionTime;
+    }
+
+    public static Builder newBuilder() {
+        return new Builder();
+    }
+
+    public static final class Builder {
+        private UUID jobId;
+        private UUID photoId;
+        private UUID userId;
+        private String jobType;
+        private Timestamp jobSubmissionTime;
+
+        private Builder() {}
+
+        public Builder withJobId(UUID val) {
+            jobId = val;
+            return this;
+        }
+
+        public Builder withPhotoId(UUID val) {
+            photoId = val;
+            return this;
+        }
+
+        public Builder withUserId(UUID val) {
+            userId = val;
+            return this;
+        }
+
+        public Builder withJobType(String val) {
+            jobType = val;
+            return this;
+        }
+
+        public Builder withJobSubmissionTime(Timestamp val) {
+            jobSubmissionTime = val;
+            return this;
+        }
+
+        public PhotoJobModel build() {
+            return new PhotoJobModel(this);
+        }
+    }
 }
