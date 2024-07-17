@@ -1,5 +1,6 @@
 package org.abx.virturalpet.service;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,7 @@ public class UploadListObjectsServiceTest {
                 .fileName("test-file.txt")
                 .userId("")
                 .photoId(UUID.randomUUID().toString())
-                .timestamp("LocalDateTime.now().toString()")
+                .timestamp(LocalDateTime.now().toString())
                 .metadata("{key1=value1}")
                 .build();
 
@@ -85,7 +86,7 @@ public class UploadListObjectsServiceTest {
                 .fileName("test-file.txt")
                 .userId("")
                 .photoId(UUID.randomUUID().toString()) // Replace with actual value
-                .timestamp("LocalDateTime.now().toString()")
+                .timestamp(LocalDateTime.now().toString())
                 .metadata("{key1=value1}")
                 .build();
 
