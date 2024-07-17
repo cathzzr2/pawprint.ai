@@ -1,6 +1,16 @@
 package org.abx.virturalpet.service;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.abx.virturalpet.exception.S3DeletionException;
+import org.abx.virturalpet.exception.S3GetException;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,16 +25,6 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Service
 public class S3Service {
@@ -120,15 +120,9 @@ public class S3Service {
             logger.error("IOException occurred while writing to file: {}", filePath, ex);
         } catch (S3Exception e) {
             logger.error("S3Exception occurred while getting object {} from bucket {}", objectKey, bucketName, e);
-            throw new GetException("Failed to get " + objectKey + " from bucket " + bucketName, e);
+            throw new S3GetException("Failed to get " + objectKey + " from bucket " + bucketName, e);
         }
         return "";
-    }
-
-    public class GetException extends RuntimeException {
-        public GetException(String message, Throwable cause) {
-            super(message, cause);
-        }
     }
 
     // reference:

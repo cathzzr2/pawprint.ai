@@ -1,8 +1,12 @@
 package org.abx.virturalpet.service;
 
 import com.adobe.testing.s3mock.testcontainers.S3MockContainer;
+import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.abx.virturalpet.configuration.S3ClientConfig;
-import org.abx.virturalpet.service.S3Service.GetException;
+import org.abx.virturalpet.exception.S3GetException;
 import org.abx.virturalpet.service.S3Service.S3UploadException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,11 +28,6 @@ import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.utils.AttributeMap;
-
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 @Testcontainers
 @ExtendWith(SpringExtension.class)
@@ -165,7 +164,7 @@ public class S3ServiceTest {
             logger.info("Successfully downloaded {} from bucket {}", objectKey, bucketName);
         } catch (IOException e) {
             Assertions.fail("Failed to create a temporary file for download", e);
-        } catch (GetException e) {
+        } catch (S3GetException e) {
             Assertions.fail("GetObject should not have failed for a valid file", e);
         }
     }
