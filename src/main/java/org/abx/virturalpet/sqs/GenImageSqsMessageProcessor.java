@@ -1,9 +1,9 @@
 package org.abx.virturalpet.sqs;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.file.Path;
 import java.sql.Timestamp;
 import java.util.UUID;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.abx.virturalpet.dto.ImageGenSqsDto;
 import org.abx.virturalpet.exception.SqsProducerException;
 import org.abx.virturalpet.model.JobProgress;

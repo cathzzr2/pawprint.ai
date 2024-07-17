@@ -1,7 +1,5 @@
 package org.abx.virturalpet.controller;
 
-import static org.mockito.Mockito.when;
-
 import org.abx.virturalpet.dto.ImmutablePhotoGenerationDto;
 import org.abx.virturalpet.dto.PhotoGenerationDto;
 import org.abx.virturalpet.service.PhotoGenerationService;
@@ -28,6 +26,7 @@ public class PhotoGenerationControllerTest {
     public void testPhotoGeneration() throws Exception {
         PhotoGenerationDto response = PhotoGenerationDto.builder()
                 .imageData("base64_encoded_photo")
+                .imageId("1")
                 .jobId("1")
                 .userId("user1")
                 .jobType("enhance")
@@ -70,7 +69,7 @@ public class PhotoGenerationControllerTest {
     @Test
     public void testCheckJobStatus_notFound() throws Exception {
 
-        when(photoGenerationService.getGenImg("100")).thenReturn(null);
+        Mockito.when(photoGenerationService.getGenImg("100")).thenReturn(null);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/generate-img/check/100").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());

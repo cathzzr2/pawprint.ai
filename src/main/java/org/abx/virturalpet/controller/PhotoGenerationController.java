@@ -16,6 +16,7 @@ public class PhotoGenerationController {
     @Autowired
     private PhotoGenerationService photoGenerationService;
 
+    @RequestMapping(value = "/generate-img", method = RequestMethod.POST)
     public ResponseEntity<PhotoGenerationDto> generateImg(@RequestBody PhotoGenerationDto photoGenerationDto) {
         PhotoGenerationDto imgGen = photoGenerationService.generateImg(
                 photoGenerationDto.getImageData(), photoGenerationDto.getUserId(), photoGenerationDto.getJobType());
