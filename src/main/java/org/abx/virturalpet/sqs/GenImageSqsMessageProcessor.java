@@ -55,11 +55,10 @@ public class GenImageSqsMessageProcessor implements MessageProcessor {
             String photoIdStr = sqsDto.photoId();
             UUID photoId = UUID.fromString(sqsDto.photoId());
             Optional<PhotoModel> optionalPhotoModel = photoRepository.findByPhotoId(photoId);
-            if (!optionalPhotoModel.isPresent()) {
+            if (optionalPhotoModel.isEmpty()) {
                 throw new RuntimeException("Photo not found for id: " + photoIdStr);
             }
             PhotoModel photoModel = optionalPhotoModel.get();
-            String s3Key = photoModel.getS3Key();
 
             // Fetch photoData from s3Key in photoRepo
             Path photoData = photoGenerationService.fetchPhotoFromS3(sqsDto.photoId());
@@ -95,7 +94,7 @@ public class GenImageSqsMessageProcessor implements MessageProcessor {
         }
     }
 
-    private void updateJobStatus(String jobId, String status) {
+    public void updateJobStatus(String jobId, String status) {
         JobProgress jobProgress = jobRepository.findByJobId(UUID.fromString(jobId));
         if (jobProgress != null) {
             jobProgress.setJobStatus(status);
