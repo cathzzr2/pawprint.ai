@@ -112,7 +112,7 @@ public class GenImageSqsMessageProcessorTest {
     }
 
     @Test
-    void processMessage_PhotoNotFound() throws Exception {
+    void processMessage_PhotoNotFound() {
         Message message = Mockito.mock(Message.class);
         Mockito.when(message.body())
                 .thenReturn("{\"photoId\":\"" + photoId.toString() + "\", \"jobId\":\"" + jobId + "\"}");

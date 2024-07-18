@@ -58,7 +58,6 @@ public class GenImageSqsMessageProcessor implements MessageProcessor {
             if (optionalPhotoModel.isEmpty()) {
                 throw new RuntimeException("Photo not found for id: " + photoIdStr);
             }
-            PhotoModel photoModel = optionalPhotoModel.get();
 
             // Fetch photoData from s3Key in photoRepo
             Path photoData = photoGenerationService.fetchPhotoFromS3(sqsDto.photoId());
