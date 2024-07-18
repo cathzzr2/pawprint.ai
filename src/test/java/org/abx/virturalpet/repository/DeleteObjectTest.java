@@ -1,6 +1,10 @@
 package org.abx.virturalpet.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.adobe.testing.s3mock.testcontainers.S3MockContainer;
+import java.net.URI;
+import java.util.List;
 import org.abx.virturalpet.configuration.S3MockConfig;
 import org.abx.virturalpet.exception.S3DeleteException;
 import org.abx.virturalpet.exception.S3GetException;
@@ -25,11 +29,6 @@ import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.utils.AttributeMap;
-
-import java.net.URI;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @Testcontainers
 @ExtendWith(SpringExtension.class)
@@ -85,7 +84,7 @@ public class DeleteObjectTest {
             assertThat(deletedObject).isNull();
         } catch (S3GetException e) {
             if (e.getCause() instanceof NoSuchKeyException) {
-                System.out.println("Object not found after deletion, as expected.");
+                logger.info("Object not found after deletion, as expected.");
                 assertThat(true).isTrue();
             } else {
                 throw e;
@@ -112,7 +111,7 @@ public class DeleteObjectTest {
             assertThat(deletedObject).isNull();
         } catch (S3GetException e) {
             if (e.getCause() instanceof NoSuchKeyException) {
-                System.out.println("Object not found after deletion, as expected.");
+                logger.info("Object not found after deletion, as expected.");
                 assertThat(true).isTrue();
             } else {
                 throw e;
