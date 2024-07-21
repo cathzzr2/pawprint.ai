@@ -2,7 +2,6 @@ package org.abx.virturalpet.service;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Timestamp;
@@ -29,15 +28,11 @@ import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.awssdk.services.sqs.SqsClient;
 
 @Service
 public class PhotoGenerationService {
     private static final Logger logger = LoggerFactory.getLogger(PhotoGenerationService.class);
-
     private final S3Client s3Client;
-    private final SqsClient sqsClient;
-    private final String queueUrl;
     private final String bucketName;
     private final ImageGenSqsProducer imageGenSqsProducer;
     private final JobResultRepository jobResultRepository;
@@ -47,8 +42,6 @@ public class PhotoGenerationService {
 
     public PhotoGenerationService(
             S3Client s3Client,
-            SqsClient sqsClient,
-            @Value("${sqs.queue.url}") String queueUrl,
             @Value("${s3.bucket.name}") String bucketName,
             ImageGenSqsProducer imageGenSqsProducer,
             JobResultRepository jobResultRepository,
@@ -56,8 +49,6 @@ public class PhotoGenerationService {
             JobProgressRepository jobProgressRepository,
             PhotoRepository photoRepository) {
         this.s3Client = s3Client;
-        this.sqsClient = sqsClient;
-        this.queueUrl = queueUrl;
         this.bucketName = bucketName;
         this.photoRepository = photoRepository;
         this.imageGenSqsProducer = imageGenSqsProducer;
@@ -93,7 +84,7 @@ public class PhotoGenerationService {
         JobProgress jobProgress = JobProgress.Builder.newBuilder()
                 .withJobId(jobId)
                 .withJobType(jobType)
-                .withJobStatus("in queue") // e
+                .withJobStatus("in queue")
                 .build();
         jobProgressRepository.save(jobProgress);
 
@@ -115,28 +106,27 @@ public class PhotoGenerationService {
 
     private PhotoModel fetchPhotoModel(UUID photoId) {
         Optional<PhotoModel> optionalPhotoModel = photoRepository.findByPhotoId(photoId);
-        if (!optionalPhotoModel.isPresent()) {
+        if (optionalPhotoModel.isEmpty()) {
             throw new RuntimeException("Photo not found for id: " + photoId.toString());
         }
         return optionalPhotoModel.get();
     }
 
     public Path fetchPhotoFromS3(String s3Key) throws IOException {
-        Path tempFile = null;
+        Path tempFile;
         try {
             tempFile = Files.createTempFile("s3_", "_" + s3Key);
 
             // Fetch object from S3
             GetObjectRequest getObjectRequest =
                     GetObjectRequest.builder().bucket(bucketName).key(s3Key).build();
-            ResponseInputStream<GetObjectResponse> s3Object = s3Client.getObject(getObjectRequest);
 
             // Write s3Object to tempFile
-            try (InputStream inputStream = s3Object;
+            try (ResponseInputStream<GetObjectResponse> s3Object = s3Client.getObject(getObjectRequest);
                     FileOutputStream outputStream = new FileOutputStream(tempFile.toFile())) {
                 byte[] buffer = new byte[1024];
                 int bytesRead;
-                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                while ((bytesRead = s3Object.read(buffer)) != -1) {
                     outputStream.write(buffer, 0, bytesRead);
                 }
             }
