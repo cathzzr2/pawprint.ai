@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 import java.util.UUID;
 
 @Entity
-@Table(name = "photo_enhancement_jobs", schema = "virtural_pet_schema")
+@Table(name = "photo_enhancement_jobs", schema = "virtual_pet_schema")
 public class PhotoJobModel {
 
     @Id

@@ -7,14 +7,7 @@ plugins {
     id("org.flywaydb.flyway") version "10.15.2"
 }
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("org.flywaydb:flyway-database-postgresql:10.1.0")
-    }
-}
+
 
 group = "org.abx"
 version = "0.0.1-SNAPSHOT"
@@ -36,6 +29,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
     implementation("javax.annotation:javax.annotation-api:1.3.2")
+    runtimeOnly("org.postgresql:postgresql")
 
 
     // aws
@@ -54,7 +48,7 @@ dependencies {
 
     annotationProcessor("org.immutables:value:2.9.3")
     compileOnly("org.immutables:value:2.9.3")
-    runtimeOnly("org.postgresql:postgresql")
+
 
     // test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -69,6 +63,8 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter:1.19.0")
 
     testImplementation("org.testcontainers:junit-jupiter:1.19.0")
+    testImplementation("org.testcontainers:postgresql:1.20.0")
+
 }
 
 tasks.withType<Test> {
