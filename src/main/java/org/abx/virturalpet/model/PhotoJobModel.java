@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 import java.util.UUID;
 
 @Entity
-@Table(name = "photo_enhancement_jobs", schema = "virtural_pet_schema")
+@Table(name = "photo_enhancement_jobs", schema = "virtual_pet_schema")
 public class PhotoJobModel {
 
     @Id
@@ -75,5 +75,48 @@ public class PhotoJobModel {
 
     public void setJobSubmissionTime(Timestamp jobSubmissionTime) {
         this.jobSubmissionTime = jobSubmissionTime;
+    }
+
+    public static final class Builder {
+        private UUID jobId;
+        private UUID photoId;
+        private UUID userId;
+        private String jobType;
+        private Timestamp jobSubmissionTime;
+
+        private Builder() {}
+
+        public static Builder newBuilder() {
+            return new Builder();
+        }
+
+        public Builder withJobId(UUID jobId) {
+            this.jobId = jobId;
+            return this;
+        }
+
+        public Builder withPhotoId(UUID photoId) {
+            this.photoId = photoId;
+            return this;
+        }
+
+        public Builder withUserId(UUID userId) {
+            this.userId = userId;
+            return this;
+        }
+
+        public Builder withJobType(String jobType) {
+            this.jobType = jobType;
+            return this;
+        }
+
+        public Builder withJobSubmissionTime(Timestamp jobSubmissionTime) {
+            this.jobSubmissionTime = jobSubmissionTime;
+            return this;
+        }
+
+        public PhotoJobModel build() {
+            return new PhotoJobModel(jobId, photoId, userId, jobType, jobSubmissionTime);
+        }
     }
 }

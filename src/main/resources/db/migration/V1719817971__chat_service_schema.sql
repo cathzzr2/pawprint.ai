@@ -1,4 +1,6 @@
 CREATE SCHEMA IF NOT EXISTS virtual_pet_schema;
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 CREATE TABLE virtual_pet_schema.thread (
     id SERIAL PRIMARY KEY,
     thread_id UUID UNIQUE NOT NULL,

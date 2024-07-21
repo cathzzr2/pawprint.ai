@@ -16,5 +16,5 @@ public interface JobResultRepository extends JpaRepository<JobResultModel, UUID>
 
     Optional<List<JobResultModel>> findByGeneratedTime(Timestamp generatedTime);
 
-    JobResultModel findByS3Key(String s3Key);
+    Optional<List<JobResultModel>> findByS3Key(String s3Key);
 }
