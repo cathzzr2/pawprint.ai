@@ -1,6 +1,7 @@
 package org.abx.virturalpet.controller;
 
 import org.abx.virturalpet.dto.ImmutablePhotoGenerationDto;
+import org.abx.virturalpet.dto.JobStatus;
 import org.abx.virturalpet.dto.PhotoGenerationDto;
 import org.abx.virturalpet.service.PhotoGenerationService;
 import org.junit.jupiter.api.Test;
@@ -30,7 +31,7 @@ public class PhotoGenerationControllerTest {
                 .jobId("1")
                 .userId("user1")
                 .jobType("enhance")
-                .status("in queue")
+                .status(JobStatus.IN_QUEUE)
                 .build();
 
         Mockito.when(photoGenerationService.generateImg("base64_encoded_photo", "user1", "enhance"))
@@ -49,13 +50,13 @@ public class PhotoGenerationControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.job_id").value("1"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.user_id").value("user1"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.job_type").value("enhance"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.jb_status").value("in queue"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.jb_status").value(JobStatus.IN_QUEUE.name()));
     }
 
     @Test
     public void testCheckJobStatus() throws Exception {
         PhotoGenerationDto response = ImmutablePhotoGenerationDto.builder()
-                .status("COMPLETED")
+                .status(JobStatus.COMPLETED)
                 .jobId("5")
                 .build();
 

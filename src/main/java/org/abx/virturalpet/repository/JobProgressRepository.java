@@ -2,6 +2,7 @@ package org.abx.virturalpet.repository;
 
 import java.util.List;
 import java.util.UUID;
+import org.abx.virturalpet.dto.JobStatus;
 import org.abx.virturalpet.model.JobProgress;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -16,5 +17,5 @@ public interface JobProgressRepository extends MongoRepository<JobProgress, Obje
 
     List<JobProgress> findByJobType(String jobType);
 
-    List<JobProgress> findByJobStatus(String jobStatus);
+    List<JobProgress> findByJobStatus(JobStatus jobStatus);
 }

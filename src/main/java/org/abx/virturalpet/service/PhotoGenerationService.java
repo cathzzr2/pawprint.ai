@@ -10,6 +10,7 @@ import java.util.UUID;
 import org.abx.virturalpet.dto.ImageGenSqsDto;
 import org.abx.virturalpet.dto.ImmutableImageGenSqsDto;
 import org.abx.virturalpet.dto.ImmutablePhotoGenerationDto;
+import org.abx.virturalpet.dto.JobStatus;
 import org.abx.virturalpet.dto.PhotoGenerationDto;
 import org.abx.virturalpet.model.JobProgress;
 import org.abx.virturalpet.model.JobResultModel;
@@ -84,7 +85,7 @@ public class PhotoGenerationService {
         JobProgress jobProgress = JobProgress.Builder.newBuilder()
                 .withJobId(jobId)
                 .withJobType(jobType)
-                .withJobStatus("in queue")
+                .withJobStatus(JobStatus.IN_QUEUE)
                 .build();
         jobProgressRepository.save(jobProgress);
 
@@ -154,7 +155,7 @@ public class PhotoGenerationService {
         if (jobProgress == null) {
             throw new RuntimeException("Job with ID " + jobId + " not found");
         }
-        String jobStatus = jobProgress.getJobStatus();
+        JobStatus jobStatus = jobProgress.getJobStatus();
         return ImmutablePhotoGenerationDto.builder().status(jobStatus).build();
     }
 

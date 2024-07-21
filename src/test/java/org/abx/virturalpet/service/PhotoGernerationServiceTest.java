@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.UUID;
+import org.abx.virturalpet.dto.JobStatus;
 import org.abx.virturalpet.dto.PhotoGenerationDto;
 import org.abx.virturalpet.model.JobProgress;
 import org.abx.virturalpet.model.JobResultModel;
@@ -79,14 +80,14 @@ public class PhotoGernerationServiceTest {
         UUID jobId = UUID.randomUUID();
         JobProgress jobProgress = new JobProgress();
         jobProgress.setJobId(jobId);
-        jobProgress.setJobStatus("completed");
+        jobProgress.setJobStatus(JobStatus.COMPLETED);
 
         Mockito.when(jobProgressRepository.findByJobId(jobId)).thenReturn(jobProgress);
 
         PhotoGenerationDto result = photoGenerationService.checkJobStatus(jobId.toString());
 
         Assertions.assertNotNull(result);
-        Assertions.assertEquals("completed", result.getStatus());
+        Assertions.assertEquals(JobStatus.COMPLETED, result.getStatus());
     }
 
     @Test

@@ -30,8 +30,8 @@ public interface PhotoGenerationDto extends Serializable {
 
     @JsonProperty("jb_status")
     @Value.Default
-    default String getStatus() {
-        return "";
+    default JobStatus getStatus() {
+        return JobStatus.FAILED;
     }
 
     @JsonProperty("user_id")

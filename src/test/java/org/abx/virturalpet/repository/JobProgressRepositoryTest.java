@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.UUID;
+import org.abx.virturalpet.dto.JobStatus;
 import org.abx.virturalpet.model.JobProgress;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -30,12 +31,12 @@ public class JobProgressRepositoryTest {
         JobProgress job1 = JobProgress.Builder.newBuilder()
                 .withJobId(jobId1)
                 .withJobType("enhance")
-                .withJobStatus("in progress")
+                .withJobStatus(JobStatus.IN_PROGRESS)
                 .build();
         JobProgress job2 = JobProgress.Builder.newBuilder()
                 .withJobId(jobId2)
                 .withJobType("enhance")
-                .withJobStatus("completed")
+                .withJobStatus(JobStatus.COMPLETED)
                 .build();
         jobProgressRepository.saveAll(List.of(job1, job2));
     }
@@ -49,7 +50,7 @@ public class JobProgressRepositoryTest {
     public void testFindByJobId() {
         JobProgress job = jobProgressRepository.findByJobId(jobId1);
         Assertions.assertNotNull(job);
-        assertThat(job.getJobStatus()).isEqualTo("in progress");
+        assertThat(job.getJobStatus()).isEqualTo(JobStatus.IN_PROGRESS);
     }
 
     @Test
@@ -62,7 +63,7 @@ public class JobProgressRepositoryTest {
 
     @Test
     public void testFindByJobStatus() {
-        List<JobProgress> jobs = jobProgressRepository.findByJobStatus("completed");
+        List<JobProgress> jobs = jobProgressRepository.findByJobStatus(JobStatus.COMPLETED);
         Assertions.assertNotNull(jobs);
         assertThat(jobs.get(0).getJobId()).isEqualTo(jobId2);
     }

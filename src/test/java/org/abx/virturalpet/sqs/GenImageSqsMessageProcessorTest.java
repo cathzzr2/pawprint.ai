@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.UUID;
 import org.abx.virturalpet.dto.ImageGenSqsDto;
+import org.abx.virturalpet.dto.JobStatus;
 import org.abx.virturalpet.exception.SqsProducerException;
 import org.abx.virturalpet.model.JobProgress;
 import org.abx.virturalpet.model.JobResultModel;
@@ -71,7 +72,7 @@ public class GenImageSqsMessageProcessorTest {
 
         jobProgress = new JobProgress();
         jobProgress.setJobId(UUID.fromString(jobId));
-        jobProgress.setJobStatus("in-progress");
+        jobProgress.setJobStatus(JobStatus.IN_PROGRESS);
     }
 
     @Test
@@ -95,7 +96,7 @@ public class GenImageSqsMessageProcessorTest {
         // Mock job progress repository to return a non-null JobProgress
         JobProgress jobProgress = new JobProgress();
         jobProgress.setJobId(UUID.fromString(jobId));
-        jobProgress.setJobStatus("in-progress");
+        jobProgress.setJobStatus(JobStatus.IN_PROGRESS);
         Mockito.when(jobRepository.findByJobId(UUID.fromString(jobId))).thenReturn(jobProgress);
 
         // Act
@@ -149,9 +150,9 @@ public class GenImageSqsMessageProcessorTest {
 
         Mockito.when(jobRepository.findByJobId(UUID.fromString(jobId))).thenReturn(jobProgress);
 
-        processor.updateJobStatus(jobId, "completed");
+        processor.updateJobStatus(jobId, JobStatus.COMPLETED);
 
-        Assertions.assertEquals("completed", jobProgress.getJobStatus());
+        Assertions.assertEquals(JobStatus.COMPLETED, jobProgress.getJobStatus());
         Mockito.verify(jobRepository).save(jobProgress);
     }
 
@@ -159,6 +160,7 @@ public class GenImageSqsMessageProcessorTest {
     void updateJobStatus_JobNotFound() {
         Mockito.when(jobRepository.findByJobId(UUID.fromString(jobId))).thenReturn(null);
 
-        Assertions.assertThrows(SqsProducerException.class, () -> processor.updateJobStatus(jobId, "completed"));
+        Assertions.assertThrows(
+                SqsProducerException.class, () -> processor.updateJobStatus(jobId, JobStatus.COMPLETED));
     }
 }
