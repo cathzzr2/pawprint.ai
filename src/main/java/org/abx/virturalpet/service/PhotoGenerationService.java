@@ -73,11 +73,7 @@ public class PhotoGenerationService {
 
         // get photoModel from photoRepo
         UUID photoId = UUID.fromString(photoIdStr);
-        Optional<PhotoModel> optionalPhotoModel = photoRepository.findByPhotoId(photoId);
-        if (!optionalPhotoModel.isPresent()) {
-            throw new RuntimeException("Photo not found for id: " + photoIdStr);
-        }
-        PhotoModel photoModel = optionalPhotoModel.get();
+        PhotoModel photoModel = fetchPhotoModel(photoId);
 
         // Save job info in jobRepo
         UUID userId = photoModel.getUserId(); // get userId from photoModel
@@ -97,7 +93,7 @@ public class PhotoGenerationService {
         JobProgress jobProgress = JobProgress.Builder.newBuilder()
                 .withJobId(jobId)
                 .withJobType(jobType)
-                .withJobStatus("in queue")
+                .withJobStatus("in queue") // e
                 .build();
         jobProgressRepository.save(jobProgress);
 
@@ -115,6 +111,14 @@ public class PhotoGenerationService {
                 .userId(userIdStr)
                 .jobType(jobType)
                 .build();
+    }
+
+    private PhotoModel fetchPhotoModel(UUID photoId) {
+        Optional<PhotoModel> optionalPhotoModel = photoRepository.findByPhotoId(photoId);
+        if (!optionalPhotoModel.isPresent()) {
+            throw new RuntimeException("Photo not found for id: " + photoId.toString());
+        }
+        return optionalPhotoModel.get();
     }
 
     public Path fetchPhotoFromS3(String s3Key) throws IOException {
