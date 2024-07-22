@@ -6,6 +6,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.abx.virturalpet.configuration.S3ClientConfig;
+import org.abx.virturalpet.exception.S3GetException;
 import org.abx.virturalpet.service.S3Service.S3UploadException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -129,6 +130,42 @@ public class S3ServiceTest {
         } catch (S3UploadException e) {
             Assertions.assertEquals("Failed to upload to S3", e.getMessage());
             logger.info("Correctly failed to upload to an invalid bucket");
+        }
+    }
+
+    @Test
+    public void testGetObject() throws S3UploadException {
+        String bucketName = TEST_BUCKET_NAME;
+        String objectKey = TEST_OBJECT_KEY;
+        String expectedContent = "This is a test file";
+
+        Path tempFilePath;
+        try {
+            tempFilePath = Files.createTempFile("test-file", ".txt");
+            Files.writeString(tempFilePath, expectedContent);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create a temporary test file", e);
+        }
+
+        Assertions.assertTrue(Files.exists(tempFilePath), "Test file does not exist");
+
+        s3Service.uploadObject(bucketName, objectKey, tempFilePath.toString());
+        logger.info("Successfully uploaded {} to bucket {}", objectKey, bucketName);
+
+        Path downloadedFilePath;
+        try {
+            downloadedFilePath = Files.createTempFile("downloaded-file", ".txt");
+            s3Service.getObject(bucketName, objectKey, downloadedFilePath.toString());
+
+            String downloadedContent = Files.readString(downloadedFilePath);
+            Assertions.assertEquals(
+                    expectedContent, downloadedContent, "Downloaded content does not match expected content");
+
+            logger.info("Successfully downloaded {} from bucket {}", objectKey, bucketName);
+        } catch (IOException e) {
+            Assertions.fail("Failed to create a temporary file for download", e);
+        } catch (S3GetException e) {
+            Assertions.fail("GetObject should not have failed for a valid file", e);
         }
     }
 }

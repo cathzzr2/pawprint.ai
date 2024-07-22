@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS virtual_pet_schema.uploaded_original_photos (
     s3_key VARCHAR(255) NOT NULL  -- S3 storage key for the photo, cannot be null.
     );
 -- Create index on 'photo_id' for faster queries
-CREATE INDEX uploaded_original_photos_photo_id_idx ON virtual_pet_schema.uploaded_original_photos (photo_id);
+CREATE INDEX IF NOT EXISTS uploaded_original_photos_photo_id_idx ON virtual_pet_schema.uploaded_original_photos (photo_id);
 
 CREATE TABLE IF NOT EXISTS virtual_pet_schema.photo_enhancement_jobs (
     job_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY, -- Primary key, auto-generated UUID.

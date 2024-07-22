@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 import java.util.UUID;
 
 @Entity
-@Table(name = "photo_enhanced_results", schema = "virtural_pet_schema")
+@Table(name = "photo_enhanced_results")
 public class JobResultModel {
 
     @Id
@@ -77,6 +77,7 @@ public class JobResultModel {
         this.s3Key = s3Key;
     }
 
+
     public static class Builder {
         private UUID resultId;
         private UUID jobId;
@@ -96,6 +97,7 @@ public class JobResultModel {
 
         public Builder withUserId(UUID userId) {
             this.userId = userId;
+
             return this;
         }
 
@@ -111,6 +113,7 @@ public class JobResultModel {
 
         public JobResultModel build() {
             return new JobResultModel(resultId, jobId, userId, generatedTime, s3Key);
+
         }
     }
 }
