@@ -6,6 +6,7 @@ plugins {
     id("com.diffplug.spotless") version "6.18.0"
     id("org.flywaydb.flyway") version "10.15.2"
 }
+val springAiVersion by extra("1.0.0-M1")
 
 
 
@@ -20,7 +21,25 @@ java {
 
 repositories {
     mavenCentral()
+    maven {
+        url = uri("https://repo.spring.io/snapshot")
+        name = "Spring Snapshots"
+        content {
+            includeGroupByRegex("org\\.springframework.*")
+            includeGroupByRegex("io\\.spring.*")
+        }
+    }
+    maven {
+        url = uri("https://repo.spring.io/milestone")
+        name = "Spring Milestones"
+        content {
+            includeGroupByRegex("org\\.springframework.*")
+            includeGroupByRegex("io\\.spring.*")
+        }
+    }
 }
+
+
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
@@ -30,6 +49,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
     implementation("javax.annotation:javax.annotation-api:1.3.2")
     runtimeOnly("org.postgresql:postgresql")
+
+
+    // spring ai
+    implementation("org.springframework.ai:spring-ai-openai-spring-boot-starter")
 
 
     // aws
@@ -67,6 +90,8 @@ dependencies {
 
 }
 
+
+
 tasks.withType<Test> {
     useJUnitPlatform()
 }
@@ -90,6 +115,11 @@ tasks.withType<JavaCompile> {
 val checkstylePublicTask = tasks.register("checkstyle") {
     group = "verification"
     description = "Runs all Checkstyle checks."
+}
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.ai:spring-ai-bom:$springAiVersion")
+    }
 }
 
 tasks.withType<Checkstyle>().forEach { checkstyleTask ->
