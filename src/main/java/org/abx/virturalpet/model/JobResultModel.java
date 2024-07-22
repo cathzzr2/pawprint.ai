@@ -77,31 +77,27 @@ public class JobResultModel {
         this.s3Key = s3Key;
     }
 
-    public static final class Builder {
+
+    public static class Builder {
         private UUID resultId;
-        private UUID userId;
         private UUID jobId;
+        private UUID userId;
         private Timestamp generatedTime;
         private String s3Key;
-
-        private Builder() {}
-
-        public static Builder newBuilder() {
-            return new Builder();
-        }
 
         public Builder withResultId(UUID resultId) {
             this.resultId = resultId;
             return this;
         }
 
-        public Builder withUserId(UUID userId) {
-            this.userId = userId;
+        public Builder withJobId(UUID jobId) {
+            this.jobId = jobId;
             return this;
         }
 
-        public Builder withJobId(UUID jobId) {
-            this.jobId = jobId;
+        public Builder withUserId(UUID userId) {
+            this.userId = userId;
+
             return this;
         }
 
@@ -116,7 +112,8 @@ public class JobResultModel {
         }
 
         public JobResultModel build() {
-            return new JobResultModel(resultId, userId, jobId, generatedTime, s3Key);
+            return new JobResultModel(resultId, jobId, userId, generatedTime, s3Key);
+
         }
     }
 }

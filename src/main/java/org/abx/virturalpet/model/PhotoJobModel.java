@@ -77,6 +77,18 @@ public class PhotoJobModel {
         this.jobSubmissionTime = jobSubmissionTime;
     }
 
+    private PhotoJobModel(Builder builder) {
+        jobId = builder.jobId;
+        photoId = builder.photoId;
+        userId = builder.userId;
+        jobType = builder.jobType;
+        jobSubmissionTime = builder.jobSubmissionTime;
+    }
+
+    public static Builder newBuilder() {
+        return new Builder();
+    }
+
     public static final class Builder {
         private UUID jobId;
         private UUID photoId;
@@ -86,37 +98,36 @@ public class PhotoJobModel {
 
         private Builder() {}
 
-        public static Builder newBuilder() {
-            return new Builder();
-        }
-
-        public Builder withJobId(UUID jobId) {
-            this.jobId = jobId;
+        public Builder withJobId(UUID val) {
+            jobId = val;
             return this;
         }
 
-        public Builder withPhotoId(UUID photoId) {
-            this.photoId = photoId;
+        public Builder withPhotoId(UUID val) {
+            photoId = val;
             return this;
         }
 
-        public Builder withUserId(UUID userId) {
-            this.userId = userId;
+        public Builder withUserId(UUID val) {
+            userId = val;
             return this;
         }
 
-        public Builder withJobType(String jobType) {
-            this.jobType = jobType;
+        public Builder withJobType(String val) {
+            jobType = val;
             return this;
         }
 
-        public Builder withJobSubmissionTime(Timestamp jobSubmissionTime) {
-            this.jobSubmissionTime = jobSubmissionTime;
+        public Builder withJobSubmissionTime(Timestamp val) {
+            jobSubmissionTime = val;
+
             return this;
         }
 
         public PhotoJobModel build() {
-            return new PhotoJobModel(jobId, photoId, userId, jobType, jobSubmissionTime);
+
+            return new PhotoJobModel(this);
+
         }
     }
 }

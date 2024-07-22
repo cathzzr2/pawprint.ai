@@ -1,6 +1,7 @@
 package org.abx.virturalpet.model;
 
 import java.util.UUID;
+import org.abx.virturalpet.dto.JobStatus;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -14,7 +15,7 @@ public class JobProgress {
 
     private String jobType;
 
-    private String jobStatus;
+    private JobStatus jobStatus;
 
     public ObjectId getId() {
         return id;
@@ -40,11 +41,11 @@ public class JobProgress {
         this.jobType = jobType;
     }
 
-    public String getJobStatus() {
+    public JobStatus getJobStatus() {
         return jobStatus;
     }
 
-    public void setJobStatus(String jobStatus) {
+    public void setJobStatus(JobStatus jobStatus) {
         this.jobStatus = jobStatus;
     }
 
@@ -56,7 +57,7 @@ public class JobProgress {
 
         private String jobType;
 
-        private String jobStatus;
+        private JobStatus jobStatus;
 
         private Builder() {}
 
@@ -79,7 +80,7 @@ public class JobProgress {
             return this;
         }
 
-        public Builder withJobStatus(String jobStatus) {
+        public Builder withJobStatus(JobStatus jobStatus) {
             this.jobStatus = jobStatus;
             return this;
         }

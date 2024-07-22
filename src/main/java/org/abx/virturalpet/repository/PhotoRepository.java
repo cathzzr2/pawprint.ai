@@ -12,4 +12,6 @@ public interface PhotoRepository extends JpaRepository<PhotoModel, UUID> {
     List<PhotoModel> findByUploadTime(java.sql.Timestamp lastActive);
 
     Optional<PhotoModel> findByS3Key(String s3Key);
+
+    Optional<PhotoModel> findByPhotoId(UUID photoId);
 }

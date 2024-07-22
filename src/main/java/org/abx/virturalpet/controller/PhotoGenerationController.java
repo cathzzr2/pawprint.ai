@@ -18,13 +18,18 @@ public class PhotoGenerationController {
 
     @RequestMapping(value = "/generate-img", method = RequestMethod.POST)
     public ResponseEntity<PhotoGenerationDto> generateImg(@RequestBody PhotoGenerationDto photoGenerationDto) {
-        PhotoGenerationDto imgGen = photoGenerationService.generateImg(photoGenerationDto.getImageData());
+        PhotoGenerationDto imgGen = photoGenerationService.generateImg(
+                photoGenerationDto.getImageData(), photoGenerationDto.getUserId(), photoGenerationDto.getJobType());
         if (imgGen == null) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(PhotoGenerationDto.builder()
                 .imageData(imgGen.getImageData())
+                .imageId(imgGen.getImageId())
                 .jobId(imgGen.getJobId())
+                .userId(imgGen.getUserId())
+                .jobType(imgGen.getJobType())
+                .status(imgGen.getStatus())
                 .build());
     }
 
@@ -37,7 +42,7 @@ public class PhotoGenerationController {
         }
 
         return ResponseEntity.ok(
-                PhotoGenerationDto.builder().completed(imgGen.getCompleted()).build());
+                PhotoGenerationDto.builder().status(imgGen.getStatus()).build());
     }
 
     @RequestMapping(value = "/generate-img/get/{imgId}", method = RequestMethod.GET)
