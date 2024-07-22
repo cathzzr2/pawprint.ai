@@ -48,7 +48,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
     implementation("javax.annotation:javax.annotation-api:1.3.2")
-
     runtimeOnly("org.postgresql:postgresql")
 
 
