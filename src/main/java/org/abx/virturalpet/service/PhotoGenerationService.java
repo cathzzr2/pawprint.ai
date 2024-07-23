@@ -148,7 +148,7 @@ public class PhotoGenerationService {
     public String callExternalApi(String jobType, String jobId, String photoData) {
         // Mock implementation of an external API call
         ImageResponse imageResponse = generativeAiService.generateImage(jobType, photoData);
-        String generatedImageUrl = null;
+        String generatedImageUrl;
         ImageGeneration imageGeneration = imageResponse.getResult();
         if (imageGeneration != null) {
             generatedImageUrl = imageGeneration.getOutput().getUrl();

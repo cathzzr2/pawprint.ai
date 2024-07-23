@@ -1,10 +1,10 @@
 package org.abx.virturalpet.sqs;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.file.Path;
 import java.sql.Timestamp;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.abx.virturalpet.dto.ImageGenSqsDto;
 import org.abx.virturalpet.dto.JobStatus;
 import org.abx.virturalpet.exception.SqsProducerException;
@@ -20,8 +20,6 @@ import org.abx.virturalpet.service.PhotoGenerationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import software.amazon.awssdk.services.sqs.model.Message;
 
 @Component

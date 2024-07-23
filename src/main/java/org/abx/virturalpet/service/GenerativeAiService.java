@@ -38,7 +38,7 @@ public class GenerativeAiService {
     }
 
     private static ImagePrompt prepareImagePrompt(String jobType, String photoUrl) {
-        String userInput = "";
+        String userInput;
         // Validate inputs
         if (photoUrl == null || photoUrl.trim().isEmpty()) {
             throw new IllegalArgumentException("Image URL cannot be blank or null.");
