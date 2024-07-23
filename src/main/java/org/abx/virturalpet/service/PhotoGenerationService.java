@@ -23,6 +23,8 @@ import org.abx.virturalpet.repository.PhotoRepository;
 import org.abx.virturalpet.sqs.ImageGenSqsProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ai.image.ImageGeneration;
+import org.springframework.ai.image.ImageResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.ResponseInputStream;
@@ -40,6 +42,7 @@ public class PhotoGenerationService {
     private final PhotoJobRepository photoJobRepository;
     private final JobProgressRepository jobProgressRepository;
     private final PhotoRepository photoRepository;
+    private final GenerativeAiService generativeAiService;
 
     public PhotoGenerationService(
             S3Client s3Client,
@@ -48,7 +51,8 @@ public class PhotoGenerationService {
             JobResultRepository jobResultRepository,
             PhotoJobRepository photoJobRepository,
             JobProgressRepository jobProgressRepository,
-            PhotoRepository photoRepository) {
+            PhotoRepository photoRepository,
+            GenerativeAiService generativeAiService) {
         this.s3Client = s3Client;
         this.bucketName = bucketName;
         this.photoRepository = photoRepository;
@@ -56,6 +60,7 @@ public class PhotoGenerationService {
         this.jobResultRepository = jobResultRepository;
         this.photoJobRepository = photoJobRepository;
         this.jobProgressRepository = jobProgressRepository;
+        this.generativeAiService = generativeAiService;
     }
 
     public PhotoGenerationDto generateImg(String imageData, String photoIdStr, String jobType) {
@@ -93,6 +98,7 @@ public class PhotoGenerationService {
         ImageGenSqsDto imageGenSqsDto = ImmutableImageGenSqsDto.builder()
                 .jobId(jobId.toString())
                 .photoId(photoId.toString())
+                .jobType(jobType)
                 .build();
         imageGenSqsProducer.sendMessage(imageGenSqsDto);
 
@@ -141,9 +147,18 @@ public class PhotoGenerationService {
 
     public String callExternalApi(String jobType, String jobId, String photoData) {
         // Mock implementation of an external API call
-        logger.info("Calling external API with jobType: {}, jobId: {}, photoData: {}", jobType, jobId, photoData);
-        // Mock API response
-        return "Success";
+        ImageResponse imageResponse = generativeAiService.generateImage(jobType, photoData);
+        String generatedImageUrl = null;
+        ImageGeneration imageGeneration = imageResponse.getResult();
+        if (imageGeneration != null) {
+            generatedImageUrl = imageGeneration.getOutput().getUrl();
+            logger.info("Calling external API with jobType: {}, jobId: {}, photoData: {}", jobType, jobId, photoData);
+        } else {
+            logger.error("Failed to generate image or no image data returned.");
+            throw new RuntimeException("Failed to generate image or no image data returned.");
+        }
+
+        return generatedImageUrl;
     }
 
     public PhotoGenerationDto checkJobStatus(String jobId) {
