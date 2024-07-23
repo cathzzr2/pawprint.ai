@@ -47,11 +47,12 @@ public class GenerativeAiService {
         }
 
         // Create a prompt based on the operation type
-        String userInput = switch (jobType.toLowerCase()) {
-            case "enhance" -> "Enhance the image: " + photoUrl;
-            case "stylize" -> "Stylize the image in a cartoon style: " + photoUrl;
-            default -> throw new IllegalArgumentException("Unsupported operation type: " + jobType);
-        };
+        String userInput =
+                switch (jobType.toLowerCase()) {
+                    case "enhance" -> "Enhance the image: " + photoUrl;
+                    case "stylize" -> "Stylize the image in a cartoon style: " + photoUrl;
+                    default -> throw new IllegalArgumentException("Unsupported operation type: " + jobType);
+                };
         return new ImagePrompt(
                 userInput,
                 OpenAiImageOptions.builder()
