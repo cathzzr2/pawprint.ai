@@ -48,6 +48,7 @@ public class SqsProducerTest {
         ImageGenSqsDto imageGenSqsDto = ImmutableImageGenSqsDto.builder()
                 .jobId("testJobId")
                 .photoId("testPhotoId")
+                .jobType("enhance")
                 .build();
 
         SendMessageResponse sendMessageResponse = SendMessageResponse.builder().build();
@@ -70,6 +71,7 @@ public class SqsProducerTest {
         ImageGenSqsDto imageGenSqsDto = ImmutableImageGenSqsDto.builder()
                 .jobId("testJobId")
                 .photoId("testPhotoId")
+                .jobType("enhance")
                 .build();
 
         RuntimeException exception = new RuntimeException("SQS error");
