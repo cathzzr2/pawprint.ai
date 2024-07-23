@@ -38,7 +38,6 @@ public class GenerativeAiService {
     }
 
     private static ImagePrompt prepareImagePrompt(String jobType, String photoUrl) {
-        String userInput;
         // Validate inputs
         if (photoUrl == null || photoUrl.trim().isEmpty()) {
             throw new IllegalArgumentException("Image URL cannot be blank or null.");
@@ -48,16 +47,11 @@ public class GenerativeAiService {
         }
 
         // Create a prompt based on the operation type
-        switch (jobType.toLowerCase()) {
-            case "enhance":
-                userInput = "Enhance the image: " + photoUrl;
-                break;
-            case "stylize":
-                userInput = "Stylize the image in a cartoon style: " + photoUrl;
-                break;
-            default:
-                throw new IllegalArgumentException("Unsupported operation type: " + jobType);
-        }
+        String userInput = switch (jobType.toLowerCase()) {
+            case "enhance" -> "Enhance the image: " + photoUrl;
+            case "stylize" -> "Stylize the image in a cartoon style: " + photoUrl;
+            default -> throw new IllegalArgumentException("Unsupported operation type: " + jobType);
+        };
         return new ImagePrompt(
                 userInput,
                 OpenAiImageOptions.builder()
