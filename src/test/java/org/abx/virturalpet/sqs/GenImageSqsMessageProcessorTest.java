@@ -1,9 +1,9 @@
 package org.abx.virturalpet.sqs;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.abx.virturalpet.dto.ImageGenSqsDto;
 import org.abx.virturalpet.dto.JobStatus;
 import org.abx.virturalpet.exception.SqsProducerException;
@@ -26,8 +26,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import software.amazon.awssdk.services.sqs.model.Message;
 
 @ExtendWith(MockitoExtension.class)
