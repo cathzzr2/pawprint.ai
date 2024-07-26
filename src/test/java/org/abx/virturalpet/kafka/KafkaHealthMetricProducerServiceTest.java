@@ -21,7 +21,11 @@ public class KafkaHealthMetricProducerServiceTest {
 
     @BeforeEach
     public void beforeEach() {
-        MockitoAnnotations.openMocks(this);
+        try {
+            MockitoAnnotations.openMocks(this);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize mocks", e);
+        }
     }
 
     @Test
