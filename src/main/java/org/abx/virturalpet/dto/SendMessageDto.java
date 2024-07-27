@@ -16,6 +16,12 @@ public interface SendMessageDto {
         return UUID.randomUUID();
     }
 
+    @JsonProperty("ai_message_content")
+    @Value.Default
+    default String getAiMessageContent() {
+        return "";
+    }
+
     @JsonProperty("thread_id")
     @Value.Default
     default UUID getThreadId() {
