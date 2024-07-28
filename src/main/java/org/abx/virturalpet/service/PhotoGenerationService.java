@@ -174,33 +174,26 @@ public class PhotoGenerationService {
             // Download the generated image from the URL
             try (InputStream inputStream = new URL(generatedImageUrl).openStream();
                     FileOutputStream fileOutputStream = new FileOutputStream(tempFile.toFile())) {
+
                 byte[] buffer = new byte[1024];
                 int bytesRead;
                 while ((bytesRead = inputStream.read(buffer)) != -1) {
                     fileOutputStream.write(buffer, 0, bytesRead);
                 }
-
-                // Upload the image to S3
-                String s3Key = "images/" + jobId + ".jpg";
-                try {
-                    s3Service.uploadObject(bucketName, s3Key, tempFile.toString());
-                    logger.info("Image successfully uploaded to S3 with key: {}", s3Key);
-                } catch (S3Service.S3UploadException e) {
-                    logger.error("Failed to upload image to S3", e);
-                    throw new RuntimeException("Failed to upload image to S3", e);
-                }
-
-                // Optionally, delete the temporary file after upload
-                Files.delete(tempFile);
-
-                return s3Key;
-            } catch (IOException e) {
-                logger.error("Error occurred while downloading or uploading the image", e);
-                throw new RuntimeException("Error occurred while downloading or uploading the image", e);
             }
-        } catch (IOException e) {
-            logger.error("Error occurred while creating temporary file", e);
-            throw new RuntimeException("Error occurred while creating temporary file", e);
+
+            // Upload the image to S3
+            String s3Key = "images/" + jobId + ".jpg";
+            s3Service.uploadObject(bucketName, s3Key, tempFile.toString());
+            logger.info("Image successfully uploaded to S3 with key: {}", s3Key);
+
+            // Optionally, delete the temporary file after upload
+            Files.delete(tempFile);
+
+            return s3Key;
+        } catch (IOException | S3Service.S3UploadException e) {
+            logger.error("Error occurred during image upload process", e);
+            throw new RuntimeException("Error occurred during image upload process", e);
         }
     }
 
