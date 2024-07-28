@@ -119,7 +119,7 @@ public class GenImageSqsMessageProcessorTest {
         Message message = Mockito.mock(Message.class);
         Mockito.when(message.body())
                 .thenReturn("{\"photoId\":\"" + photoId.toString() + "\", \"jobId\":\"" + jobId
-                        + "\", \"jobType\":\"enhance\"}");
+                        + "\", \"jobType\":\"ENHANCE\"}");
 
         // Mock photo not found
         Mockito.when(photoRepository.findByPhotoId(photoId)).thenReturn(Optional.empty());
