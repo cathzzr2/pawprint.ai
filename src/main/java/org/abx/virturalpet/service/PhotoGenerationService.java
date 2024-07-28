@@ -2,6 +2,8 @@ package org.abx.virturalpet.service;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Timestamp;
@@ -44,6 +46,7 @@ public class PhotoGenerationService {
     private final JobProgressRepository jobProgressRepository;
     private final PhotoRepository photoRepository;
     private final GenerativeAiService generativeAiService;
+    private final S3Service s3Service;
 
     public PhotoGenerationService(
             S3Client s3Client,
@@ -53,7 +56,8 @@ public class PhotoGenerationService {
             PhotoJobRepository photoJobRepository,
             JobProgressRepository jobProgressRepository,
             PhotoRepository photoRepository,
-            GenerativeAiService generativeAiService) {
+            GenerativeAiService generativeAiService,
+            S3Service s3Service) {
         this.s3Client = s3Client;
         this.bucketName = bucketName;
         this.photoRepository = photoRepository;
@@ -62,6 +66,7 @@ public class PhotoGenerationService {
         this.photoJobRepository = photoJobRepository;
         this.jobProgressRepository = jobProgressRepository;
         this.generativeAiService = generativeAiService;
+        this.s3Service = s3Service;
     }
 
     public PhotoGenerationDto generateImg(String imageData, String photoIdStr, JobType jobType) {
@@ -158,8 +163,45 @@ public class PhotoGenerationService {
             logger.error("Failed to generate image or no image data returned.");
             throw new RuntimeException("Failed to generate image or no image data returned.");
         }
+        String s3Key = uploadImageToS3(generatedImageUrl, jobId);
+        return s3Key;
+    }
 
-        return generatedImageUrl;
+    public String uploadImageToS3(String generatedImageUrl, String jobId) {
+        Path tempFile;
+        try {
+            tempFile = Files.createTempFile("s3_", "_" + jobId + ".jpg");
+            // Download the generated image from the URL
+            try (InputStream inputStream = new URL(generatedImageUrl).openStream();
+                    FileOutputStream fileOutputStream = new FileOutputStream(tempFile.toFile())) {
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    fileOutputStream.write(buffer, 0, bytesRead);
+                }
+
+                // Upload the image to S3
+                String s3Key = "images/" + jobId + ".jpg";
+                try {
+                    s3Service.uploadObject(bucketName, s3Key, tempFile.toString());
+                    logger.info("Image successfully uploaded to S3 with key: {}", s3Key);
+                } catch (S3Service.S3UploadException e) {
+                    logger.error("Failed to upload image to S3", e);
+                    throw new RuntimeException("Failed to upload image to S3", e);
+                }
+
+                // Optionally, delete the temporary file after upload
+                Files.delete(tempFile);
+
+                return s3Key;
+            } catch (IOException e) {
+                logger.error("Error occurred while downloading or uploading the image", e);
+                throw new RuntimeException("Error occurred while downloading or uploading the image", e);
+            }
+        } catch (IOException e) {
+            logger.error("Error occurred while creating temporary file", e);
+            throw new RuntimeException("Error occurred while creating temporary file", e);
+        }
     }
 
     public PhotoGenerationDto checkJobStatus(String jobId) {
