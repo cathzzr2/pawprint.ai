@@ -11,6 +11,7 @@ import org.abx.virturalpet.dto.ImageGenSqsDto;
 import org.abx.virturalpet.dto.ImmutableImageGenSqsDto;
 import org.abx.virturalpet.dto.ImmutablePhotoGenerationDto;
 import org.abx.virturalpet.dto.JobStatus;
+import org.abx.virturalpet.dto.JobType;
 import org.abx.virturalpet.dto.PhotoGenerationDto;
 import org.abx.virturalpet.model.JobProgress;
 import org.abx.virturalpet.model.JobResultModel;
@@ -63,7 +64,7 @@ public class PhotoGenerationService {
         this.generativeAiService = generativeAiService;
     }
 
-    public PhotoGenerationDto generateImg(String imageData, String photoIdStr, String jobType) {
+    public PhotoGenerationDto generateImg(String imageData, String photoIdStr, JobType jobType) {
         if (imageData == null || imageData.isEmpty()) {
             throw new IllegalArgumentException("Image data cannot be null or empty");
         }
@@ -81,7 +82,7 @@ public class PhotoGenerationService {
                 .withJobId(jobId)
                 .withPhotoId(photoId)
                 .withUserId(userId)
-                .withJobType(jobType)
+                .withJobType(jobType.name())
                 .withJobSubmissionTime(timestamp)
                 .build();
         photoJobRepository.save(photoJobModel);
@@ -89,7 +90,7 @@ public class PhotoGenerationService {
         // Save job progress in MongoDB
         JobProgress jobProgress = JobProgress.Builder.newBuilder()
                 .withJobId(jobId)
-                .withJobType(jobType)
+                .withJobType(jobType.name())
                 .withJobStatus(JobStatus.IN_QUEUE)
                 .build();
         jobProgressRepository.save(jobProgress);
@@ -145,7 +146,7 @@ public class PhotoGenerationService {
         }
     }
 
-    public String callExternalApi(String jobType, String jobId, String photoData) {
+    public String callExternalApi(JobType jobType, String jobId, String photoData) {
         // Mock implementation of an external API call
         ImageResponse imageResponse = generativeAiService.generateImage(jobType, photoData);
         String generatedImageUrl;

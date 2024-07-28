@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.abx.virturalpet.dto.ImageGenSqsDto;
 import org.abx.virturalpet.dto.JobStatus;
+import org.abx.virturalpet.dto.JobType;
 import org.abx.virturalpet.exception.SqsProducerException;
 import org.abx.virturalpet.model.JobProgress;
 import org.abx.virturalpet.model.JobResultModel;
@@ -81,7 +82,7 @@ public class GenImageSqsMessageProcessorTest {
         Message message = Mockito.mock(Message.class);
         Mockito.when(message.body())
                 .thenReturn("{\"photoId\":\"" + photoId.toString() + "\", \"jobId\":\"" + jobId
-                        + "\", \"jobType\":\"enhance\"}");
+                        + "\", \"jobType\":\"ENHANCE\"}");
 
         // Initialize the ObjectMapper to parse the message body
         ObjectMapper objectMapper = new ObjectMapper();
@@ -89,7 +90,7 @@ public class GenImageSqsMessageProcessorTest {
 
         Mockito.when(photoRepository.findByPhotoId(photoId)).thenReturn(Optional.of(photoModel));
         Mockito.when(photoGenerationService.fetchPhotoFromS3(sqsDto.photoId())).thenReturn(Path.of("photoDataPath"));
-        Mockito.when(photoGenerationService.callExternalApi("enhance", jobId, "photoDataPath"))
+        Mockito.when(photoGenerationService.callExternalApi(JobType.ENHANCE, jobId, "photoDataPath"))
                 .thenReturn("apiResponse");
 
         Mockito.when(photoJobRepository.findByPhotoId(photoId)).thenReturn(photoJobModel);
@@ -132,7 +133,7 @@ public class GenImageSqsMessageProcessorTest {
         Message message = Mockito.mock(Message.class);
         Mockito.when(message.body())
                 .thenReturn("{\"photoId\":\"" + photoId.toString() + "\", \"jobId\":\"" + jobId
-                        + "\", \"jobType\":\"enhance\"}");
+                        + "\", \"jobType\":\"ENHANCE\"}");
 
         // Initialize the ObjectMapper to parse the message body
         ObjectMapper objectMapper = new ObjectMapper();
@@ -140,7 +141,7 @@ public class GenImageSqsMessageProcessorTest {
 
         Mockito.when(photoRepository.findByPhotoId(photoId)).thenReturn(Optional.of(photoModel));
         Mockito.when(photoGenerationService.fetchPhotoFromS3(sqsDto.photoId())).thenReturn(Path.of("photoDataPath"));
-        Mockito.when(photoGenerationService.callExternalApi("enhance", jobId, "photoDataPath"))
+        Mockito.when(photoGenerationService.callExternalApi(JobType.ENHANCE, jobId, "photoDataPath"))
                 .thenReturn("apiResponse");
 
         Mockito.when(photoJobRepository.findByPhotoId(photoId)).thenReturn(null);

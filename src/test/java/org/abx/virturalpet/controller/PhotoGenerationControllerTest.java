@@ -2,6 +2,7 @@ package org.abx.virturalpet.controller;
 
 import org.abx.virturalpet.dto.ImmutablePhotoGenerationDto;
 import org.abx.virturalpet.dto.JobStatus;
+import org.abx.virturalpet.dto.JobType;
 import org.abx.virturalpet.dto.PhotoGenerationDto;
 import org.abx.virturalpet.service.PhotoGenerationService;
 import org.junit.jupiter.api.Test;
@@ -30,16 +31,16 @@ public class PhotoGenerationControllerTest {
                 .imageId("1")
                 .jobId("1")
                 .userId("user1")
-                .jobType("enhance")
+                .jobType(JobType.ENHANCE)
                 .status(JobStatus.IN_QUEUE)
                 .build();
 
-        Mockito.when(photoGenerationService.generateImg("base64_encoded_photo", "user1", "enhance"))
+        Mockito.when(photoGenerationService.generateImg("base64_encoded_photo", "user1", JobType.ENHANCE))
                 .thenReturn(response);
 
         String requestJsonPayload = "{\n" + "  \"image_data\": \"base64_encoded_photo\",\n"
                 + "  \"user_id\": \"user1\",\n"
-                + "  \"job_type\": \"enhance\"\n"
+                + "  \"job_type\": \"ENHANCE\"\n"
                 + "}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/generate-img")
@@ -49,7 +50,7 @@ public class PhotoGenerationControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.image_data").value("base64_encoded_photo"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.job_id").value("1"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.user_id").value("user1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.job_type").value("enhance"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.job_type").value(JobType.ENHANCE.name()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.jb_status").value(JobStatus.IN_QUEUE.name()));
     }
 

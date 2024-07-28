@@ -127,7 +127,6 @@ public class PhotoJobModel {
         public PhotoJobModel build() {
 
             return new PhotoJobModel(this);
-
         }
     }
 }

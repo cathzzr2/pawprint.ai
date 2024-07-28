@@ -12,5 +12,5 @@ public interface ImageGenSqsDto {
 
     String photoId();
 
-    String getJobType();
+    JobType getJobType();
 }

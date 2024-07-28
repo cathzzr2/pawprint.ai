@@ -1,5 +1,6 @@
 package org.abx.virturalpet.service;
 
+import org.abx.virturalpet.dto.JobType;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.image.ImagePrompt;
@@ -33,25 +34,24 @@ public class GenerativeAiService {
         return chatModel.stream(preparePrompt(userInput));
     }
 
-    public ImageResponse generateImage(String jobType, String photoUrl) {
+    public ImageResponse generateImage(JobType jobType, String photoUrl) {
         return openaiImageModel.call(prepareImagePrompt(jobType, photoUrl));
     }
 
-    private static ImagePrompt prepareImagePrompt(String jobType, String photoUrl) {
+    private static ImagePrompt prepareImagePrompt(JobType jobType, String photoUrl) {
         // Validate inputs
         if (photoUrl == null || photoUrl.trim().isEmpty()) {
             throw new IllegalArgumentException("Image URL cannot be blank or null.");
         }
-        if (jobType == null || jobType.trim().isEmpty()) {
+        if (jobType == null) {
             throw new IllegalArgumentException("Operation type cannot be blank or null.");
         }
 
         // Create a prompt based on the operation type
         String userInput =
-                switch (jobType.toLowerCase()) {
-                    case "enhance" -> "Enhance the image: " + photoUrl;
-                    case "stylize" -> "Stylize the image in a cartoon style: " + photoUrl;
-                    default -> throw new IllegalArgumentException("Unsupported operation type: " + jobType);
+                switch (jobType) {
+                    case ENHANCE -> "Enhance the image: " + photoUrl;
+                    case STYLIZE -> "Stylize the image in a cartoon style: " + photoUrl;
                 };
         return new ImagePrompt(
                 userInput,

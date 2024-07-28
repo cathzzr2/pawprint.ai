@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.abx.virturalpet.dto.ImageGenSqsDto;
 import org.abx.virturalpet.dto.JobStatus;
+import org.abx.virturalpet.dto.JobType;
 import org.abx.virturalpet.exception.SqsProducerException;
 import org.abx.virturalpet.model.JobProgress;
 import org.abx.virturalpet.model.JobResultModel;
@@ -63,7 +64,7 @@ public class GenImageSqsMessageProcessor implements MessageProcessor {
             // Fetch photoData from s3Key in photoRepo
             Path photoData = photoGenerationService.fetchPhotoFromS3(sqsDto.photoId());
             String jobId = sqsDto.getJobId();
-            String jobType = sqsDto.getJobType();
+            JobType jobType = sqsDto.getJobType();
 
             // Call external API
             String apiResponse = photoGenerationService.callExternalApi(jobType, jobId, photoData.toString());
