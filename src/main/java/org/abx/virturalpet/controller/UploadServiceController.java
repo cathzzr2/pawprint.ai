@@ -11,6 +11,7 @@ import org.abx.virturalpet.dto.ImmutableUploadServiceDto;
 import org.abx.virturalpet.dto.ListObjectsRequestDto;
 import org.abx.virturalpet.dto.UploadServiceDto;
 import org.abx.virturalpet.dto.UploadServiceRequest;
+import org.abx.virturalpet.service.S3Service;
 import org.abx.virturalpet.service.UploadListObjectsService;
 import org.abx.virturalpet.service.UploadService;
 import org.slf4j.Logger;
@@ -30,10 +31,13 @@ public class UploadServiceController {
     private static final Logger logger = LoggerFactory.getLogger(UploadServiceController.class);
     private final UploadService uploadService;
     private final UploadListObjectsService uploadListObjectsService;
+    private final S3Service s3Service;
 
-    public UploadServiceController(UploadService uploadService, UploadListObjectsService uploadListObjectsService) {
+    public UploadServiceController(
+            UploadService uploadService, UploadListObjectsService uploadListObjectsService, S3Service s3Service) {
         this.uploadService = uploadService;
         this.uploadListObjectsService = uploadListObjectsService;
+        this.s3Service = s3Service;
     }
 
     @RequestMapping(value = "/media/upload", method = RequestMethod.POST)
@@ -78,8 +82,8 @@ public class UploadServiceController {
     @PostMapping("/media/upload/list-objects")
     public ResponseEntity<List<UploadServiceDto>> listObjects(
             @RequestBody ListObjectsRequestDto listObjectsRequestDto) {
-        List<UploadServiceDto> results = uploadListObjectsService.listObjects(
-                listObjectsRequestDto.getBuckName(), listObjectsRequestDto.getPrefix());
+        List<UploadServiceDto> results =
+                s3Service.listObjects(listObjectsRequestDto.getBuckName(), listObjectsRequestDto.getPrefix());
         if (results.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
@@ -101,7 +105,7 @@ public class UploadServiceController {
     @PostMapping("/media/upload/list-objects-with-pagination")
     public ResponseEntity<List<UploadServiceDto>> listObjectsWithPagination(
             @RequestBody ListObjectsRequestDto listObjectsRequestDto) {
-        List<UploadServiceDto> results = uploadListObjectsService.listObjectsWithPagination(
+        List<UploadServiceDto> results = s3Service.listObjectsWithPagination(
                 listObjectsRequestDto.getBuckName(),
                 listObjectsRequestDto.getPrefix(),
                 listObjectsRequestDto.getOffset(),

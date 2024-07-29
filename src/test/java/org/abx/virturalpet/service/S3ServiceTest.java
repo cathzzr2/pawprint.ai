@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import org.abx.virturalpet.configuration.S3ClientConfig;
 import org.abx.virturalpet.exception.S3GetException;
+import org.abx.virturalpet.repository.PhotoRepository;
 import org.abx.virturalpet.service.S3Service.S3UploadException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,6 +42,7 @@ public class S3ServiceTest {
     private S3Client s3Client;
     private S3Service s3Service;
     private S3Presigner s3Presigner;
+    private PhotoRepository photoRepository;
     private static final String TEST_BUCKET_NAME = "test-bucket";
     private static final String TEST_OBJECT_KEY = "test-object";
 
@@ -74,7 +76,7 @@ public class S3ServiceTest {
                 .serviceConfiguration(serviceConfig)
                 .build();
 
-        s3Service = new S3Service(s3Client, s3Presigner);
+        s3Service = new S3Service(s3Client, s3Presigner, photoRepository);
 
         s3Client.createBucket(
                 CreateBucketRequest.builder().bucket(TEST_BUCKET_NAME).build());

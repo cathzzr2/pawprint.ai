@@ -9,6 +9,7 @@ import org.abx.virturalpet.dto.ImmutableListObjectsRequestDto;
 import org.abx.virturalpet.dto.ImmutableUploadServiceDto;
 import org.abx.virturalpet.dto.ListObjectsRequestDto;
 import org.abx.virturalpet.dto.UploadServiceDto;
+import org.abx.virturalpet.service.S3Service;
 import org.abx.virturalpet.service.UploadListObjectsService;
 import org.abx.virturalpet.service.UploadService;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,6 +38,9 @@ public class UploadServiceControllerTest {
 
     @MockBean
     private UploadListObjectsService uploadListObjectsService;
+
+    @MockBean
+    private S3Service s3Service;
 
     private ListObjectsRequestDto listObjectsRequestDto;
     private UploadServiceDto uploadServiceDto;
@@ -120,8 +124,7 @@ public class UploadServiceControllerTest {
     public void testListObjects() throws Exception {
         List<UploadServiceDto> uploadServiceDtos = Collections.singletonList(uploadServiceDto);
 
-        when(uploadListObjectsService.listObjects(
-                        listObjectsRequestDto.getBuckName(), listObjectsRequestDto.getPrefix()))
+        when(s3Service.listObjects(listObjectsRequestDto.getBuckName(), listObjectsRequestDto.getPrefix()))
                 .thenReturn(uploadServiceDtos);
         mockMvc.perform(MockMvcRequestBuilders.post("/media/upload/list-objects")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -137,8 +140,7 @@ public class UploadServiceControllerTest {
 
     @Test
     public void testListObjects_NotFound() throws Exception {
-        when(uploadListObjectsService.listObjects(
-                        listObjectsRequestDto.getBuckName(), listObjectsRequestDto.getPrefix()))
+        when(s3Service.listObjects(listObjectsRequestDto.getBuckName(), listObjectsRequestDto.getPrefix()))
                 .thenReturn(Collections.emptyList());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/media/upload/list-objects")
@@ -151,7 +153,7 @@ public class UploadServiceControllerTest {
     public void testListObjectsWithPagination() throws Exception {
         List<UploadServiceDto> uploadServiceDtos = Collections.singletonList(uploadServiceDto);
 
-        when(uploadListObjectsService.listObjectsWithPagination(
+        when(s3Service.listObjectsWithPagination(
                         listObjectsRequestDto.getBuckName(),
                         listObjectsRequestDto.getPrefix(),
                         listObjectsRequestDto.getOffset(),
@@ -172,7 +174,7 @@ public class UploadServiceControllerTest {
 
     @Test
     void testListObjectsWithPagination_NotFound() throws Exception {
-        when(uploadListObjectsService.listObjectsWithPagination(
+        when(s3Service.listObjectsWithPagination(
                         listObjectsRequestDto.getBuckName(),
                         listObjectsRequestDto.getPrefix(),
                         listObjectsRequestDto.getOffset(),
