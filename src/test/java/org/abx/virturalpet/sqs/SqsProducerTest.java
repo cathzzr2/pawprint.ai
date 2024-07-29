@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import org.abx.virturalpet.dto.ImageGenSqsDto;
 import org.abx.virturalpet.dto.ImmutableImageGenSqsDto;
+import org.abx.virturalpet.dto.JobType;
 import org.abx.virturalpet.exception.SqsProducerException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,6 +49,7 @@ public class SqsProducerTest {
         ImageGenSqsDto imageGenSqsDto = ImmutableImageGenSqsDto.builder()
                 .jobId("testJobId")
                 .photoId("testPhotoId")
+                .jobType(JobType.ENHANCE)
                 .build();
 
         SendMessageResponse sendMessageResponse = SendMessageResponse.builder().build();
@@ -70,6 +72,7 @@ public class SqsProducerTest {
         ImageGenSqsDto imageGenSqsDto = ImmutableImageGenSqsDto.builder()
                 .jobId("testJobId")
                 .photoId("testPhotoId")
+                .jobType(JobType.ENHANCE)
                 .build();
 
         RuntimeException exception = new RuntimeException("SQS error");

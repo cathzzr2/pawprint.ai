@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.UUID;
 import org.abx.virturalpet.dto.JobStatus;
+import org.abx.virturalpet.dto.JobType;
 import org.abx.virturalpet.dto.PhotoGenerationDto;
 import org.abx.virturalpet.model.JobProgress;
 import org.abx.virturalpet.model.JobResultModel;
@@ -52,7 +53,7 @@ public class PhotoGernerationServiceTest {
     public void testGenerateImg() {
         String imageData = "testImageData";
         String photoIdStr = UUID.randomUUID().toString();
-        String jobType = "enhance";
+        JobType jobType = JobType.ENHANCE;
         UUID photoId = UUID.fromString(photoIdStr);
         UUID userId = UUID.randomUUID();
         PhotoModel photoModel = new PhotoModel();

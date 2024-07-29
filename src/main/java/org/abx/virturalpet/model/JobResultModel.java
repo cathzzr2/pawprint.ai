@@ -77,7 +77,6 @@ public class JobResultModel {
         this.s3Key = s3Key;
     }
 
-
     public static class Builder {
         private UUID resultId;
         private UUID jobId;
@@ -113,7 +112,6 @@ public class JobResultModel {
 
         public JobResultModel build() {
             return new JobResultModel(resultId, jobId, userId, generatedTime, s3Key);
-
         }
     }
 }

@@ -42,8 +42,8 @@ public interface PhotoGenerationDto extends Serializable {
 
     @JsonProperty("job_type")
     @Value.Default
-    default String getJobType() {
-        return "";
+    default JobType getJobType() {
+        return JobType.ENHANCE;
     }
 
     static ImmutablePhotoGenerationDto.Builder builder() {
