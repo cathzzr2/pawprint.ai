@@ -86,7 +86,7 @@ public class MediaQualityService {
         if (optionalJobResult.isEmpty()) {
             throw new RuntimeException("Job result not found for id: " + jobId.toString());
         }
-        JobResultModel jobResult = jobResultRepository.findByJobId(jobId);
+        JobResultModel jobResult = optionalJobResult.get();
         ImprovedPhotoResultDto jobResultDto = getJobResultDto(jobResult);
 
         return jobResultDto;
