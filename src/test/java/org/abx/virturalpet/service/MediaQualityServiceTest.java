@@ -26,16 +26,14 @@ public class MediaQualityServiceTest {
     private MediaQualityService mediaQualityService;
 
     @BeforeEach
-    public void setUp() {
+    public void beforeEach() {
         photoJobRepository = Mockito.mock(PhotoJobRepository.class);
         jobResultRepository = Mockito.mock(JobResultRepository.class);
         imageGenSqsProducer = Mockito.mock(ImageGenSqsProducer.class);
         jobProgressRepository = Mockito.mock(JobProgressRepository.class);
 
-        mediaQualityService = new MediaQualityService(photoJobRepository, jobResultRepository, imageGenSqsProducer, jobProgressRepository);
-
-        System.out.println("photoJobRepository mock: " + photoJobRepository);
-        System.out.println("mediaQualityService instance: " + mediaQualityService);
+        mediaQualityService = new MediaQualityService(
+                photoJobRepository, jobResultRepository, imageGenSqsProducer, jobProgressRepository);
     }
 
     @Test
