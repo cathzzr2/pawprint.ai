@@ -3,6 +3,7 @@ package org.abx.virturalpet.controller;
 import java.util.UUID;
 import org.abx.virturalpet.dto.ImprovePhotoJbDto;
 import org.abx.virturalpet.dto.ImprovedPhotoResultDto;
+import org.abx.virturalpet.dto.JobType;
 import org.abx.virturalpet.service.MediaQualityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,8 +26,8 @@ public class MediaQualityServiceController {
     public ResponseEntity<ImprovePhotoJbDto> improvePhotoJbID(@RequestBody ImprovePhotoJbDto improvePhotoJbDto) {
         UUID userId = improvePhotoJbDto.getUserId();
         UUID photoId = improvePhotoJbDto.getPhotoId();
-        String photoType = improvePhotoJbDto.getJobType();
-        ImprovePhotoJbDto res = mediaQualityService.enqueuePhoto(userId, photoId, photoType);
+        JobType jobType = improvePhotoJbDto.getJobType();
+        ImprovePhotoJbDto res = mediaQualityService.enqueuePhoto(userId, photoId, jobType);
         if (res == null) {
             logger.warn("No improvement found for photo with ID: {}", improvePhotoJbDto.getJobId());
             return ResponseEntity.notFound().build();

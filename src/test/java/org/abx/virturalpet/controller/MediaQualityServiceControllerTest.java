@@ -7,6 +7,7 @@ import java.sql.Timestamp;
 import java.util.UUID;
 import org.abx.virturalpet.dto.ImprovePhotoJbDto;
 import org.abx.virturalpet.dto.ImprovedPhotoResultDto;
+import org.abx.virturalpet.dto.JobType;
 import org.abx.virturalpet.service.MediaQualityService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +37,7 @@ public class MediaQualityServiceControllerTest {
     public void testImprovePhotoJbID_success() throws Exception {
         UUID userId = UUID.randomUUID();
         UUID photoId = UUID.randomUUID();
-        String jobType = "enhance";
+        JobType jobType = JobType.ENHANCE;
         UUID jobId = UUID.randomUUID();
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
@@ -72,7 +73,7 @@ public class MediaQualityServiceControllerTest {
     void testImprovePhotoJbID_NotFound() throws Exception {
         UUID userId = UUID.randomUUID();
         UUID photoId = UUID.randomUUID();
-        String jobType = "enhance";
+        JobType jobType = JobType.ENHANCE;
 
         when(mediaQualityService.enqueuePhoto(userId, photoId, jobType)).thenReturn(null);
 

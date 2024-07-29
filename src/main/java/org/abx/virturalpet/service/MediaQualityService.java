@@ -2,35 +2,56 @@ package org.abx.virturalpet.service;
 
 import java.sql.Timestamp;
 import java.util.UUID;
+import org.abx.virturalpet.dto.ImageGenSqsDto;
+import org.abx.virturalpet.dto.ImmutableImageGenSqsDto;
 import org.abx.virturalpet.dto.ImmutableImprovePhotoJbDto;
 import org.abx.virturalpet.dto.ImmutableImprovedPhotoResultDto;
 import org.abx.virturalpet.dto.ImprovePhotoJbDto;
 import org.abx.virturalpet.dto.ImprovedPhotoResultDto;
+import org.abx.virturalpet.dto.JobStatus;
+import org.abx.virturalpet.dto.JobType;
+import org.abx.virturalpet.model.JobProgress;
 import org.abx.virturalpet.model.JobResultModel;
 import org.abx.virturalpet.model.PhotoJobModel;
+import org.abx.virturalpet.repository.JobProgressRepository;
 import org.abx.virturalpet.repository.JobResultRepository;
 import org.abx.virturalpet.repository.PhotoJobRepository;
+import org.abx.virturalpet.sqs.ImageGenSqsProducer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class MediaQualityService {
 
+    private static final Logger logger = LoggerFactory.getLogger(MediaQualityService.class);
     private final PhotoJobRepository photoJobRepository;
     private final JobResultRepository jobResultRepository;
+    private final JobProgressRepository jobProgressRepository;
+    private final ImageGenSqsProducer imageGenSqsProducer;
 
-    public MediaQualityService(PhotoJobRepository photoJobRepository, JobResultRepository jobResultRepository) {
+    public MediaQualityService(
+            PhotoJobRepository photoJobRepository,
+            JobResultRepository jobResultRepository,
+            ImageGenSqsProducer imageGenSqsProducer,
+            JobProgressRepository jobProgressRepository) {
         this.photoJobRepository = photoJobRepository;
         this.jobResultRepository = jobResultRepository;
+        this.imageGenSqsProducer = imageGenSqsProducer;
+        this.jobProgressRepository = jobProgressRepository;
     }
 
-    public ImprovePhotoJbDto enqueuePhoto(UUID userId, UUID photoId, String jobType) {
+    public ImprovePhotoJbDto enqueuePhoto(UUID userId, UUID photoId, JobType jobType) {
         if (photoId == null || userId == null || jobType == null) {
-            return null;
+            logger.error("Invalid input: photoId={}, userId={}, jobType={}", photoId, userId, jobType);
+            throw new IllegalArgumentException("Photo ID, User ID, and Job Type cannot be null");
         }
 
         UUID jobId = UUID.randomUUID();
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        ImmutableImprovePhotoJbDto newPhotoJob = ImmutableImprovePhotoJbDto.builder()
+
+        // build dto for controller
+        ImmutableImprovePhotoJbDto improvePhotoJbDto = ImmutableImprovePhotoJbDto.builder()
                 .photoId(photoId)
                 .jobId(jobId)
                 .userId(userId)
@@ -38,28 +59,44 @@ public class MediaQualityService {
                 .jobSubmissionTime(timestamp)
                 .build();
 
-        PhotoJobModel jobModel = fromJobDto(newPhotoJob);
-        photoJobRepository.save(jobModel);
-
-        return ImmutableImprovePhotoJbDto.builder()
-                .photoId(photoId)
-                .jobId(jobId)
-                .userId(userId)
-                .jobType(jobType)
-                .jobSubmissionTime(timestamp)
+        PhotoJobModel photoJobModel = PhotoJobModel.newBuilder()
+                .withJobId(jobId)
+                .withPhotoId(photoId)
+                .withUserId(userId)
+                .withJobType(jobType.name())
+                .withJobSubmissionTime(timestamp)
                 .build();
+        logger.info("Saving PhotoJobModel: {}", photoJobModel);
+        photoJobRepository.save(photoJobModel);
+
+        // Save job progress in MongoDB
+        JobProgress jobProgress = JobProgress.Builder.newBuilder()
+                .withJobId(jobId)
+                .withJobType(jobType.name())
+                .withJobStatus(JobStatus.IN_QUEUE)
+                .build();
+        jobProgressRepository.save(jobProgress);
+
+        // Send message to SQS
+        ImageGenSqsDto imageGenSqsDto = ImmutableImageGenSqsDto.builder()
+                .jobId(jobId.toString())
+                .photoId(photoId.toString())
+                .jobType(jobType)
+                .build();
+        imageGenSqsProducer.sendMessage(imageGenSqsDto);
+
+        return improvePhotoJbDto;
     }
 
     public ImprovedPhotoResultDto getImprovedPhoto(UUID jobId) {
-        if (jobId == null) {
-            return null;
-        }
 
+        if (jobId == null) {
+            logger.error("Invalid input: jobId cannot be null");
+            throw new IllegalArgumentException("jobId cannot be null");
+        }
         JobResultModel jobResult = jobResultRepository.findByJobId(jobId);
         ImprovedPhotoResultDto jobResultDto = fromResultModel(jobResult);
 
-        UUID resultId = UUID.randomUUID();
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         return jobResultDto;
     }
 
@@ -73,12 +110,28 @@ public class MediaQualityService {
                 .build();
     }
 
-    public PhotoJobModel fromJobDto(ImprovePhotoJbDto improvePhotoJbDto) {
+    public PhotoJobModel getPhotoJobModel(ImprovePhotoJbDto improvePhotoJbDto) {
         return new PhotoJobModel(
                 improvePhotoJbDto.getJobId(),
                 improvePhotoJbDto.getPhotoId(),
                 improvePhotoJbDto.getUserId(),
-                improvePhotoJbDto.getJobType(),
+                improvePhotoJbDto.getJobType().name(),
                 improvePhotoJbDto.getJobSubmissionTime());
+    }
+
+    public ImageGenSqsDto getImageGenSqsDto(ImprovePhotoJbDto improvePhotoJbDto) {
+        return ImmutableImageGenSqsDto.builder()
+                .jobId(improvePhotoJbDto.getJobId().toString())
+                .photoId(improvePhotoJbDto.getPhotoId().toString())
+                .jobType(improvePhotoJbDto.getJobType())
+                .build();
+    }
+
+    public JobProgress getJobProgress(ImprovePhotoJbDto improvePhotoJbDto) {
+        return JobProgress.Builder.newBuilder()
+                .withJobId(improvePhotoJbDto.getJobId())
+                .withJobType(improvePhotoJbDto.getJobType().name())
+                .withJobStatus(JobStatus.IN_QUEUE)
+                .build();
     }
 }
