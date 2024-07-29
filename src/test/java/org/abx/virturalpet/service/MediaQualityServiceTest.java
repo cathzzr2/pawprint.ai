@@ -111,11 +111,10 @@ public class MediaQualityServiceTest {
 
         Mockito.when(jobResultRepository.findByJobId(jobId)).thenReturn(null);
 
-        RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> {
-            mediaQualityService.getImprovedPhoto(jobId);
-        });
+        RuntimeException exception = Assertions.assertThrows(RuntimeException.class,
+                () -> mediaQualityService.getImprovedPhoto(jobId));
 
-        Assertions.assertEquals("Job result not found for id: " + jobId.toString(), exception.getMessage());
+        Assertions.assertEquals("Job result not found for id: " + jobId, exception.getMessage());
 
         Mockito.verify(jobResultRepository, Mockito.times(1)).findByJobId(jobId);
     }
