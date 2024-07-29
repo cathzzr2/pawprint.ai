@@ -1,6 +1,7 @@
 package org.abx.virturalpet.service;
 
 import java.sql.Timestamp;
+import java.util.Optional;
 import java.util.UUID;
 import org.abx.virturalpet.dto.ImageGenSqsDto;
 import org.abx.virturalpet.dto.ImmutableImageGenSqsDto;
@@ -59,30 +60,16 @@ public class MediaQualityService {
                 .jobSubmissionTime(timestamp)
                 .build();
 
-        PhotoJobModel photoJobModel = PhotoJobModel.newBuilder()
-                .withJobId(jobId)
-                .withPhotoId(photoId)
-                .withUserId(userId)
-                .withJobType(jobType.name())
-                .withJobSubmissionTime(timestamp)
-                .build();
-        logger.info("Saving PhotoJobModel: {}", photoJobModel);
+        // save job info in PhotoJobRepo
+        PhotoJobModel photoJobModel = getPhotoJobModel(improvePhotoJbDto);
         photoJobRepository.save(photoJobModel);
 
         // Save job progress in MongoDB
-        JobProgress jobProgress = JobProgress.Builder.newBuilder()
-                .withJobId(jobId)
-                .withJobType(jobType.name())
-                .withJobStatus(JobStatus.IN_QUEUE)
-                .build();
+        JobProgress jobProgress = getJobProgress(improvePhotoJbDto);
         jobProgressRepository.save(jobProgress);
 
         // Send message to SQS
-        ImageGenSqsDto imageGenSqsDto = ImmutableImageGenSqsDto.builder()
-                .jobId(jobId.toString())
-                .photoId(photoId.toString())
-                .jobType(jobType)
-                .build();
+        ImageGenSqsDto imageGenSqsDto = getImageGenSqsDto(improvePhotoJbDto);
         imageGenSqsProducer.sendMessage(imageGenSqsDto);
 
         return improvePhotoJbDto;
@@ -94,13 +81,18 @@ public class MediaQualityService {
             logger.error("Invalid input: jobId cannot be null");
             throw new IllegalArgumentException("jobId cannot be null");
         }
+        // handle null case
+        Optional<JobResultModel> optionalJobResult = Optional.ofNullable(jobResultRepository.findByJobId(jobId));
+        if (optionalJobResult.isEmpty()) {
+            throw new RuntimeException("Job result not found for id: " + jobId.toString());
+        }
         JobResultModel jobResult = jobResultRepository.findByJobId(jobId);
-        ImprovedPhotoResultDto jobResultDto = fromResultModel(jobResult);
+        ImprovedPhotoResultDto jobResultDto = getJobResultDto(jobResult);
 
         return jobResultDto;
     }
 
-    public ImprovedPhotoResultDto fromResultModel(JobResultModel jobResultModel) {
+    public ImprovedPhotoResultDto getJobResultDto(JobResultModel jobResultModel) {
         return ImmutableImprovedPhotoResultDto.builder()
                 .resultId(jobResultModel.getResultId())
                 .userId(jobResultModel.getUserId())

@@ -1,10 +1,13 @@
 package org.abx.virturalpet.service;
 
+import java.sql.Timestamp;
 import java.util.UUID;
 import org.abx.virturalpet.dto.ImageGenSqsDto;
 import org.abx.virturalpet.dto.ImprovePhotoJbDto;
+import org.abx.virturalpet.dto.ImprovedPhotoResultDto;
 import org.abx.virturalpet.dto.JobType;
 import org.abx.virturalpet.model.JobProgress;
+import org.abx.virturalpet.model.JobResultModel;
 import org.abx.virturalpet.model.PhotoJobModel;
 import org.abx.virturalpet.repository.JobProgressRepository;
 import org.abx.virturalpet.repository.JobResultRepository;
@@ -70,5 +73,50 @@ public class MediaQualityServiceTest {
         ImageGenSqsDto capturedImageGenSqsDto = imageGenSqsDtoCaptor.getValue();
         Assertions.assertNotNull(capturedImageGenSqsDto);
         Assertions.assertEquals(photoId.toString(), capturedImageGenSqsDto.photoId());
+    }
+
+    @Test
+    public void testGetImprovedPhoto() {
+        UUID jobId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+        UUID resultId = UUID.randomUUID();
+        String s3Key = "s3-key";
+        Timestamp generatedTime = new Timestamp(System.currentTimeMillis());
+
+        // set up JobResultModel
+        JobResultModel jobResultModel = new JobResultModel();
+        jobResultModel.setJobId(jobId);
+        jobResultModel.setUserId(userId);
+        jobResultModel.setResultId(resultId);
+        jobResultModel.setS3Key(s3Key);
+        jobResultModel.setGeneratedTime(generatedTime);
+
+        Mockito.when(jobResultRepository.findByJobId(jobId)).thenReturn(jobResultModel);
+
+        ImprovedPhotoResultDto result = mediaQualityService.getImprovedPhoto(jobId);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(jobId, result.getJobId());
+        Assertions.assertEquals(userId, result.getUserId());
+        Assertions.assertEquals(resultId, result.getResultId());
+        Assertions.assertEquals(s3Key, result.getS3Key());
+        Assertions.assertEquals(generatedTime, result.getGeneratedTime());
+
+        Mockito.verify(jobResultRepository, Mockito.times(1)).findByJobId(jobId);
+    }
+
+    @Test
+    public void testGetImprovedPhoto_NotFound() {
+        UUID jobId = UUID.randomUUID();
+
+        Mockito.when(jobResultRepository.findByJobId(jobId)).thenReturn(null);
+
+        RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> {
+            mediaQualityService.getImprovedPhoto(jobId);
+        });
+
+        Assertions.assertEquals("Job result not found for id: " + jobId.toString(), exception.getMessage());
+
+        Mockito.verify(jobResultRepository, Mockito.times(1)).findByJobId(jobId);
     }
 }
