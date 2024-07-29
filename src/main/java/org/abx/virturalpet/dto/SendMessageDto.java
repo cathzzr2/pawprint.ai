@@ -3,6 +3,7 @@ package org.abx.virturalpet.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.sql.Timestamp;
 import java.util.UUID;
 import org.immutables.value.Value;
 
@@ -37,7 +38,7 @@ public interface SendMessageDto {
     @JsonProperty("timestamp")
     @Value.Default
     default String getTimestamp() {
-        return "";
+        return String.valueOf(new Timestamp(System.currentTimeMillis()));
     }
 
     @JsonProperty("status_code")
