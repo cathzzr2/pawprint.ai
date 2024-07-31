@@ -10,7 +10,6 @@ import org.abx.virturalpet.dto.ImmutableUploadServiceDto;
 import org.abx.virturalpet.dto.ListObjectsRequestDto;
 import org.abx.virturalpet.dto.UploadServiceDto;
 import org.abx.virturalpet.service.S3Service;
-import org.abx.virturalpet.service.UploadListObjectsService;
 import org.abx.virturalpet.service.UploadService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,9 +34,6 @@ public class UploadServiceControllerTest {
 
     @MockBean
     private UploadService uploadService;
-
-    @MockBean
-    private UploadListObjectsService uploadListObjectsService;
 
     @MockBean
     private S3Service s3Service;

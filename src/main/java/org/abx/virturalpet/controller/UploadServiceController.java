@@ -12,7 +12,6 @@ import org.abx.virturalpet.dto.ListObjectsRequestDto;
 import org.abx.virturalpet.dto.UploadServiceDto;
 import org.abx.virturalpet.dto.UploadServiceRequest;
 import org.abx.virturalpet.service.S3Service;
-import org.abx.virturalpet.service.UploadListObjectsService;
 import org.abx.virturalpet.service.UploadService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,13 +29,10 @@ import org.springframework.web.multipart.MultipartFile;
 public class UploadServiceController {
     private static final Logger logger = LoggerFactory.getLogger(UploadServiceController.class);
     private final UploadService uploadService;
-    private final UploadListObjectsService uploadListObjectsService;
     private final S3Service s3Service;
 
-    public UploadServiceController(
-            UploadService uploadService, UploadListObjectsService uploadListObjectsService, S3Service s3Service) {
+    public UploadServiceController(UploadService uploadService, S3Service s3Service) {
         this.uploadService = uploadService;
-        this.uploadListObjectsService = uploadListObjectsService;
         this.s3Service = s3Service;
     }
 
