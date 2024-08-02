@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.abx.virturalpet.dto.ImageGenSqsDto;
 import org.abx.virturalpet.dto.JobStatus;
+import org.abx.virturalpet.dto.JobType;
 import org.abx.virturalpet.exception.SqsProducerException;
 import org.abx.virturalpet.model.JobProgress;
 import org.abx.virturalpet.model.JobResultModel;
@@ -63,9 +64,10 @@ public class GenImageSqsMessageProcessor implements MessageProcessor {
             // Fetch photoData from s3Key in photoRepo
             Path photoData = photoGenerationService.fetchPhotoFromS3(sqsDto.photoId());
             String jobId = sqsDto.getJobId();
+            JobType jobType = sqsDto.getJobType();
 
             // Call external API
-            String apiResponse = photoGenerationService.callExternalApi(jobId, photoIdStr, photoData.toString());
+            String apiResponse = photoGenerationService.callExternalApi(jobType, jobId, photoData.toString());
 
             // Fetch job info from PhotoJobRepo;
             PhotoJobModel photoJobModel = photoJobRepository.findByPhotoId(photoId);
@@ -77,11 +79,11 @@ public class GenImageSqsMessageProcessor implements MessageProcessor {
 
             // Save API response in result repository
             JobResultModel jobResultModel = new JobResultModel.Builder()
-                    .withResultId(UUID.randomUUID()) // resultId
-                    .withJobId(UUID.fromString(jobId)) // jobId
-                    .withUserId(userId) // userId
+                    .withResultId(UUID.randomUUID())
+                    .withJobId(UUID.fromString(jobId))
+                    .withUserId(userId)
                     .withGeneratedTime(new Timestamp(System.currentTimeMillis()))
-                    .withS3Key(apiResponse) // s3Key or API response
+                    .withS3Key(apiResponse) // API response
                     .build();
 
             resultRepository.save(jobResultModel);

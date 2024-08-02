@@ -2,6 +2,8 @@ package org.abx.virturalpet.service;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Timestamp;
@@ -11,6 +13,7 @@ import org.abx.virturalpet.dto.ImageGenSqsDto;
 import org.abx.virturalpet.dto.ImmutableImageGenSqsDto;
 import org.abx.virturalpet.dto.ImmutablePhotoGenerationDto;
 import org.abx.virturalpet.dto.JobStatus;
+import org.abx.virturalpet.dto.JobType;
 import org.abx.virturalpet.dto.PhotoGenerationDto;
 import org.abx.virturalpet.model.JobProgress;
 import org.abx.virturalpet.model.JobResultModel;
@@ -23,6 +26,8 @@ import org.abx.virturalpet.repository.PhotoRepository;
 import org.abx.virturalpet.sqs.ImageGenSqsProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ai.image.ImageGeneration;
+import org.springframework.ai.image.ImageResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.ResponseInputStream;
@@ -40,6 +45,8 @@ public class PhotoGenerationService {
     private final PhotoJobRepository photoJobRepository;
     private final JobProgressRepository jobProgressRepository;
     private final PhotoRepository photoRepository;
+    private final GenerativeAiService generativeAiService;
+    private final S3Service s3Service;
 
     public PhotoGenerationService(
             S3Client s3Client,
@@ -48,7 +55,9 @@ public class PhotoGenerationService {
             JobResultRepository jobResultRepository,
             PhotoJobRepository photoJobRepository,
             JobProgressRepository jobProgressRepository,
-            PhotoRepository photoRepository) {
+            PhotoRepository photoRepository,
+            GenerativeAiService generativeAiService,
+            S3Service s3Service) {
         this.s3Client = s3Client;
         this.bucketName = bucketName;
         this.photoRepository = photoRepository;
@@ -56,9 +65,11 @@ public class PhotoGenerationService {
         this.jobResultRepository = jobResultRepository;
         this.photoJobRepository = photoJobRepository;
         this.jobProgressRepository = jobProgressRepository;
+        this.generativeAiService = generativeAiService;
+        this.s3Service = s3Service;
     }
 
-    public PhotoGenerationDto generateImg(String imageData, String photoIdStr, String jobType) {
+    public PhotoGenerationDto generateImg(String imageData, String photoIdStr, JobType jobType) {
         if (imageData == null || imageData.isEmpty()) {
             throw new IllegalArgumentException("Image data cannot be null or empty");
         }
@@ -76,7 +87,7 @@ public class PhotoGenerationService {
                 .withJobId(jobId)
                 .withPhotoId(photoId)
                 .withUserId(userId)
-                .withJobType(jobType)
+                .withJobType(jobType.name())
                 .withJobSubmissionTime(timestamp)
                 .build();
         photoJobRepository.save(photoJobModel);
@@ -84,7 +95,7 @@ public class PhotoGenerationService {
         // Save job progress in MongoDB
         JobProgress jobProgress = JobProgress.Builder.newBuilder()
                 .withJobId(jobId)
-                .withJobType(jobType)
+                .withJobType(jobType.name())
                 .withJobStatus(JobStatus.IN_QUEUE)
                 .build();
         jobProgressRepository.save(jobProgress);
@@ -93,6 +104,7 @@ public class PhotoGenerationService {
         ImageGenSqsDto imageGenSqsDto = ImmutableImageGenSqsDto.builder()
                 .jobId(jobId.toString())
                 .photoId(photoId.toString())
+                .jobType(jobType)
                 .build();
         imageGenSqsProducer.sendMessage(imageGenSqsDto);
 
@@ -139,11 +151,50 @@ public class PhotoGenerationService {
         }
     }
 
-    public String callExternalApi(String jobType, String jobId, String photoData) {
+    public String callExternalApi(JobType jobType, String jobId, String photoData) {
         // Mock implementation of an external API call
-        logger.info("Calling external API with jobType: {}, jobId: {}, photoData: {}", jobType, jobId, photoData);
-        // Mock API response
-        return "Success";
+        ImageResponse imageResponse = generativeAiService.generateImage(jobType, photoData);
+        String generatedImageUrl;
+        ImageGeneration imageGeneration = imageResponse.getResult();
+        if (imageGeneration != null) {
+            generatedImageUrl = imageGeneration.getOutput().getUrl();
+            logger.info("Calling external API with jobType: {}, jobId: {}, photoData: {}", jobType, jobId, photoData);
+        } else {
+            logger.error("Failed to generate image or no image data returned.");
+            throw new RuntimeException("Failed to generate image or no image data returned.");
+        }
+        String s3Key = uploadImageToS3(generatedImageUrl, jobId);
+        return s3Key;
+    }
+
+    public String uploadImageToS3(String generatedImageUrl, String jobId) {
+        Path tempFile;
+        try {
+            tempFile = Files.createTempFile("s3_", "_" + jobId + ".jpg");
+            // Download the generated image from the URL
+            try (InputStream inputStream = new URL(generatedImageUrl).openStream();
+                    FileOutputStream fileOutputStream = new FileOutputStream(tempFile.toFile())) {
+
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    fileOutputStream.write(buffer, 0, bytesRead);
+                }
+            }
+
+            // Upload the image to S3
+            String s3Key = "images/" + jobId + ".jpg";
+            s3Service.uploadObject(bucketName, s3Key, tempFile.toString());
+            logger.info("Image successfully uploaded to S3 with key: {}", s3Key);
+
+            // Optionally, delete the temporary file after upload
+            Files.delete(tempFile);
+
+            return s3Key;
+        } catch (IOException | S3Service.S3UploadException e) {
+            logger.error("Error occurred during image upload process", e);
+            throw new RuntimeException("Error occurred during image upload process", e);
+        }
     }
 
     public PhotoGenerationDto checkJobStatus(String jobId) {

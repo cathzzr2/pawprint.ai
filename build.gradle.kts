@@ -53,7 +53,8 @@ dependencies {
 
     // spring ai
     implementation("org.springframework.ai:spring-ai-openai-spring-boot-starter")
-
+    // kafka
+    implementation("org.springframework.kafka:spring-kafka:3.2.2")
 
     // aws
     implementation(platform("software.amazon.awssdk:bom:2.25.57"))
