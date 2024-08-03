@@ -62,7 +62,9 @@ public class ChatServiceControllerTest {
     @Test
     public void testFetchMessages_ByUserId_returnOk() throws Exception {
         UUID userId = UUID.randomUUID();
-        when(chatService.fetchMessagesByUserId(userId))
+        int pageNumber = 0;
+        int pageSize = 10;
+        when(chatService.fetchMessagesByUserId(userId, pageNumber, pageSize))
                 .thenReturn(List.of(ImmutableSendMessageDto.builder()
                         .userId(userId)
                         .threadId(UUID.randomUUID())
@@ -73,6 +75,8 @@ public class ChatServiceControllerTest {
                         .build()));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/messages/receive/user/{userId}", userId)
+                        .param("pageNumber", String.valueOf(pageNumber))
+                        .param("pageSize", String.valueOf(pageSize))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].user_id").value(userId.toString()))
@@ -87,7 +91,9 @@ public class ChatServiceControllerTest {
     @Test
     public void testFetchMessages_ByUserId_returnNotFound() throws Exception {
         UUID userId = UUID.randomUUID();
-        when(chatService.fetchMessagesByUserId(userId))
+        int pageNumber = 0;
+        int pageSize = 10;
+        when(chatService.fetchMessagesByUserId(userId, pageNumber, pageSize))
                 .thenReturn(List.of(ImmutableSendMessageDto.builder()
                         .userId(userId)
                         .threadId(UUID.randomUUID())
@@ -98,6 +104,8 @@ public class ChatServiceControllerTest {
                         .build()));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/messages/receive/user/{userId}", userId)
+                        .param("pageNumber", String.valueOf(pageNumber))
+                        .param("pageSize", String.valueOf(pageSize))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].user_id").value(userId.toString()))
@@ -112,7 +120,9 @@ public class ChatServiceControllerTest {
     @Test
     public void testFetchMessages_ByThreadId_returnOk() throws Exception {
         UUID threadId = UUID.randomUUID();
-        when(chatService.fetchMessagesByThreadId(threadId))
+        int pageNumber = 0;
+        int pageSize = 10;
+        when(chatService.fetchMessagesByThreadId(threadId, pageNumber, pageSize))
                 .thenReturn(List.of(ImmutableSendMessageDto.builder()
                         .userId(UUID.randomUUID())
                         .threadId(threadId)
@@ -123,6 +133,8 @@ public class ChatServiceControllerTest {
                         .build()));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/messages/receive/thread/{threadId}", threadId)
+                        .param("pageNumber", String.valueOf(pageNumber))
+                        .param("pageSize", String.valueOf(pageSize))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].user_id").isNotEmpty())
@@ -137,7 +149,9 @@ public class ChatServiceControllerTest {
     @Test
     public void testFetchMessages_ByThreadId_returnNotFound() throws Exception {
         UUID threadId = UUID.randomUUID();
-        when(chatService.fetchMessagesByThreadId(threadId))
+        int pageNumber = 0;
+        int pageSize = 10;
+        when(chatService.fetchMessagesByThreadId(threadId, pageNumber, pageSize))
                 .thenReturn(List.of(ImmutableSendMessageDto.builder()
                         .userId(UUID.randomUUID())
                         .threadId(threadId)
@@ -148,6 +162,8 @@ public class ChatServiceControllerTest {
                         .build()));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/messages/receive/thread/{threadId}", threadId)
+                        .param("pageNumber", String.valueOf(pageNumber))
+                        .param("pageSize", String.valueOf(pageSize))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].user_id").isNotEmpty())

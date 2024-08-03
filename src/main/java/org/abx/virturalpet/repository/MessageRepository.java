@@ -12,9 +12,13 @@ import org.springframework.stereotype.Repository;
 public interface MessageRepository extends MongoRepository<MessageModel, String> {
     // Overloaded methods
     List<MessageModel> findByThreadId(UUID threadId);
+
     Page<MessageModel> findByThreadId(UUID threadId, Pageable pageable);
 
     // Non-overloaded methods
     MessageModel findByMessage(String message);
+
     List<MessageModel> findByUserId(UUID userId);
+
+    Page<MessageModel> findByUserId(UUID userId, Pageable pageable);
 }
