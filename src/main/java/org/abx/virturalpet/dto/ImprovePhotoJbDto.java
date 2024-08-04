@@ -31,8 +31,8 @@ public interface ImprovePhotoJbDto {
 
     @JsonProperty("job_type")
     @Value.Default
-    default String getJobType() {
-        return "";
+    default JobType getJobType() {
+        return JobType.ENHANCE;
     }
 
     @JsonProperty("job_submission_time")
