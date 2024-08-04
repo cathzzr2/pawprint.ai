@@ -102,4 +102,40 @@ public class ChatServiceTest {
     public void testFetchMessagesByThreadId_nullThreadId() {
         chatService.fetchMessagesByThreadId(null, 0, 10);
     }
+
+    @Test
+    public void testFetchAiMessagesByThreadId() {
+        UUID threadId = UUID.randomUUID();
+        int pageNumber = 0;
+        int pageSize = 10;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Page<MessageModel> mockPage = new PageImpl<>(Collections.emptyList());
+        Mockito.when(messageRepository.findByThreadId(Mockito.eq(threadId), Mockito.eq(pageable)))
+                .thenReturn(mockPage);
+        chatService.fetchAiMessagesByThreadId(threadId, pageNumber, pageSize);
+        org.mockito.Mockito.verify(messageRepository).findByThreadId(Mockito.eq(threadId), Mockito.eq(pageable));
+    }
+
+    @Test
+    public void testFetchAiMessagesByThreadId_nullThreadId() {
+        chatService.fetchAiMessagesByThreadId(null, 0, 10);
+    }
+
+    @Test
+    public void testFetchAiMessagesByUserId() {
+        UUID userId = UUID.randomUUID();
+        int pageNumber = 0;
+        int pageSize = 10;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Page<MessageModel> mockPage = new PageImpl<>(Collections.emptyList());
+        Mockito.when(messageRepository.findByUserId(Mockito.eq(userId), Mockito.eq(pageable)))
+                .thenReturn(mockPage);
+        chatService.fetchAiMessagesByUserId(userId, pageNumber, pageSize);
+        org.mockito.Mockito.verify(messageRepository).findByUserId(Mockito.eq(userId), Mockito.eq(pageable));
+    }
+
+    @Test
+    public void testFetchAiMessagesByUserId_nullUserId() {
+        chatService.fetchAiMessagesByUserId(null, 0, 10);
+    }
 }

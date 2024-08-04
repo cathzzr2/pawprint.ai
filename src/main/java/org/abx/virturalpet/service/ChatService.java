@@ -115,7 +115,7 @@ public class ChatService {
         return threadMessagesDto;
     }
 
-    public List<SendMessageDto> fetchAiMessagesByThreadId(UUID threadId) {
+    public List<SendMessageDto> fetchAiMessagesByThreadId(UUID threadId, int pageNumber, int pageSize) {
         if (threadId == null) {
             List<SendMessageDto> errorResponse = new ArrayList<>();
             errorResponse.add(ImmutableSendMessageDto.builder()
@@ -125,34 +125,20 @@ public class ChatService {
             return errorResponse;
         }
 
-        List<SendMessageDto> threadMessagesDto = new ArrayList<>();
-        int pageSize = 10; // Set a page size
-        Pageable pageable = Pageable.ofSize(pageSize);
+        List<SendMessageDto> aiMessagesDto = new ArrayList<>();
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Page<MessageModel> threadMessagesPage = messageRepository.findByThreadId(threadId, pageable);
 
-        while (true) {
-            Page<MessageModel> threadMessages = messageRepository.findByThreadId(threadId, pageable);
-
-            // Filter and convert AI messages to SendMessageDto
-            for (MessageModel messageModel : threadMessages) {
-                if (messageModel.getAiMessageContent() != null
-                        && !messageModel.getAiMessageContent().isEmpty()) {
-                    threadMessagesDto.add(fromMessageModel(messageModel));
-                }
+        for (MessageModel messageModel : threadMessagesPage) {
+            if (messageModel.getAiMessageContent() != null
+                    && !messageModel.getAiMessageContent().isEmpty()) {
+                aiMessagesDto.add(fromMessageModel(messageModel));
             }
-
-            // Check if the current page is the last page
-            if (threadMessages.getContent().size() < pageSize) {
-                break;
-            }
-
-            // Move to the next page
-            pageable = pageable.next();
         }
-
-        return threadMessagesDto;
+        return aiMessagesDto;
     }
 
-    public List<SendMessageDto> fetchUserAiMessagesByUserId(UUID userId) {
+    public List<SendMessageDto> fetchAiMessagesByUserId(UUID userId, int pageNumber, int pageSize) {
         if (userId == null) {
             List<SendMessageDto> errorResponse = new ArrayList<>();
             errorResponse.add(ImmutableSendMessageDto.builder()
@@ -162,12 +148,8 @@ public class ChatService {
             return errorResponse;
         }
 
-        // Define the pageable object
-        Pageable pageable = Pageable.ofSize(10); // or use any page size as required
-
-        // Fetch paginated user messages
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<MessageModel> userMessagesPage = messageRepository.findByUserId(userId, pageable);
-
         List<SendMessageDto> userMessagesDto = new ArrayList<>();
         for (MessageModel messageModel : userMessagesPage) {
             if (messageModel.getAiMessageContent() != null
