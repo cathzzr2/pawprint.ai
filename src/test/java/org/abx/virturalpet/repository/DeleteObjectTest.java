@@ -1,6 +1,7 @@
 package org.abx.virturalpet.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 import com.adobe.testing.s3mock.testcontainers.S3MockContainer;
 import java.net.URI;
@@ -41,6 +42,7 @@ public class DeleteObjectTest {
     private final S3MockContainer s3MockContainer = new S3MockContainer("latest");
     private S3Client s3Client;
     private S3Service s3Service;
+    private PhotoRepository photoRepository;
 
     @BeforeEach
     public void before() {
@@ -61,7 +63,8 @@ public class DeleteObjectTest {
                         StaticCredentialsProvider.create(AwsBasicCredentials.create("dummy-key", "dummy-secret")))
                 .serviceConfiguration(serviceConfig)
                 .build();
-        s3Service = new S3Service(s3Client, null);
+        photoRepository = mock(PhotoRepository.class);
+        s3Service = new S3Service(s3Client, null, photoRepository);
 
         try {
             CreateBucketRequest createBucketRequest =
