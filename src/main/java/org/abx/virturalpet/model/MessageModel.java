@@ -19,6 +19,8 @@ public class MessageModel {
 
     private Timestamp timestamp;
 
+    private String aiMessageContent;
+
     public MessageModel() {
         this.id = UUID.randomUUID().toString();
     }
@@ -66,6 +68,14 @@ public class MessageModel {
 
     public void setUserId(UUID userId) {
         this.userId = userId;
+    }
+
+    public void setAiMessageContent(String aiMessageContent) {
+        this.aiMessageContent = aiMessageContent;
+    }
+
+    public String getAiMessageContent() {
+        return aiMessageContent;
     }
 
     public static final class Builder {
