@@ -72,14 +72,16 @@ public class UploadServiceControllerTest {
                 .metadata("some metadata")
                 .build();
 
-        when(uploadService.uploadMediaRequest(Mockito.anyString(), Mockito.any(byte[].class)))
+        Mockito.when(uploadService.uploadMediaRequest(
+                        Mockito.anyString(), Mockito.anyString(), Mockito.any(byte[].class)))
                 .thenReturn(dto);
 
         mockMvc.perform(MockMvcRequestBuilders.multipart("/media/upload")
                         .file(file)
                         .param("userId", "user1")
                         .param("timestamp", "2023-01-01T00:00:00Z")
-                        .param("metadata", "some metadata"))
+                        .param("metadata", "some metadata")
+                        .param("photoId", "photo1"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.file_name").value("test.txt"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.user_id").value("user1"))
@@ -96,7 +98,8 @@ public class UploadServiceControllerTest {
                         .file(emptyFile)
                         .param("userId", "user1")
                         .param("timestamp", "2023-01-01T00:00:00Z")
-                        .param("metadata", "some metadata"))
+                        .param("metadata", "some metadata")
+                        .param("photoId", "photo1"))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
@@ -105,14 +108,15 @@ public class UploadServiceControllerTest {
         MockMultipartFile file =
                 new MockMultipartFile("file", "test.txt", MediaType.TEXT_PLAIN_VALUE, "Test content".getBytes());
 
-        when(uploadService.uploadMediaRequest(Mockito.anyString(), Mockito.any(byte[].class)))
-                .thenThrow(new RuntimeException("Runtime Exception"));
+        Mockito.when(
+                uploadService.uploadMediaRequest(Mockito.anyString(), Mockito.anyString(), Mockito.any(byte[].class)));
 
         mockMvc.perform(MockMvcRequestBuilders.multipart("/media/upload")
                         .file(file)
                         .param("userId", "user1")
                         .param("timestamp", "2023-01-01T00:00:00Z")
-                        .param("metadata", "some metadata"))
+                        .param("metadata", "some metadata")
+                        .param("photoId", "photo1"))
                 .andExpect(MockMvcResultMatchers.status().isInternalServerError());
     }
 
