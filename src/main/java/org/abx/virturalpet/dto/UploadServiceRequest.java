@@ -7,8 +7,17 @@ public class UploadServiceRequest {
     private String timestamp;
     private String metadata;
     private MultipartFile file;
+    private String photoId;
 
     // Getters and setters
+
+    public String getPhotoId() {
+        return photoId;
+    }
+
+    public void setPhotoId(String photoId) {
+        this.photoId = photoId;
+    }
 
     public String getUserId() {
         return userId;

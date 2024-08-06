@@ -57,14 +57,7 @@ public class UploadServiceController {
             String fileName = file.getOriginalFilename();
             byte[] fileData = file.getBytes();
 
-            UploadServiceDto uploadServiceDto = ImmutableUploadServiceDto.builder()
-                    .fileName(fileName)
-                    .userId(request.getUserId())
-                    .timestamp(request.getTimestamp())
-                    .metadata(request.getMetadata())
-                    .build();
-
-            UploadServiceDto response = uploadService.uploadMediaRequest(fileName, fileData);
+            UploadServiceDto response = uploadService.uploadMediaRequest(request.getPhotoId(), fileName, fileData);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             logger.error("Error processing file upload", e);

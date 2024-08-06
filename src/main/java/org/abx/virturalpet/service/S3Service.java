@@ -87,7 +87,7 @@ public class S3Service {
 
     // reference:
     // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javav2/example_code/s3/src/main/java/com/example/s3/PutObject.java
-    public class S3UploadException extends Exception {
+    public static class S3UploadException extends Exception {
         public S3UploadException(String message, Throwable cause) {
             super(message, cause);
         }
