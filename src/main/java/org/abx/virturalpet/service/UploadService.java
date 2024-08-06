@@ -119,7 +119,6 @@ public class UploadService {
             s3Service.uploadObject(bucketName, objectKey, tempFile.getAbsolutePath());
             return objectKey;
         } catch (Exception e) {
-            logger.error("Error uploading file to S3", e);
             throw new S3UploadException("Failed to upload to S3", e);
         } finally {
             if (tempFile != null && tempFile.exists()) {
