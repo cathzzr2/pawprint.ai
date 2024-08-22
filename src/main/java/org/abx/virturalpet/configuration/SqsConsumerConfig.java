@@ -1,5 +1,10 @@
 package org.abx.virturalpet.configuration;
 
+import org.abx.virturalpet.repository.JobProgressRepository;
+import org.abx.virturalpet.repository.JobResultRepository;
+import org.abx.virturalpet.repository.PhotoJobRepository;
+import org.abx.virturalpet.repository.PhotoRepository;
+import org.abx.virturalpet.service.PhotoGenerationService;
 import org.abx.virturalpet.sqs.GenImageSqsMessageProcessor;
 import org.abx.virturalpet.sqs.MessageProcessor;
 import org.abx.virturalpet.sqs.SqsConsumer;
@@ -15,8 +20,14 @@ public class SqsConsumerConfig {
 
     // create your own message processor for different tasks
     @Bean
-    public GenImageSqsMessageProcessor genImageSqsMessageProcessor() {
-        return new GenImageSqsMessageProcessor();
+    public GenImageSqsMessageProcessor genImageSqsMessageProcessor(
+            PhotoGenerationService photoGenerationService,
+            JobProgressRepository jobRepository,
+            PhotoJobRepository photoJobRepository,
+            JobResultRepository resultRepository,
+            PhotoRepository photoRepository) {
+        return new GenImageSqsMessageProcessor(
+                photoGenerationService, jobRepository, photoJobRepository, resultRepository, photoRepository);
     }
 
     // feed in different message processor to process different job

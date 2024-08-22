@@ -1,7 +1,9 @@
 package org.abx.virturalpet.controller;
 
+import java.util.UUID;
 import org.abx.virturalpet.dto.ImprovePhotoJbDto;
 import org.abx.virturalpet.dto.ImprovedPhotoResultDto;
+import org.abx.virturalpet.dto.JobType;
 import org.abx.virturalpet.service.MediaQualityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,28 +24,37 @@ public class MediaQualityServiceController {
 
     @RequestMapping(value = "/improve", method = RequestMethod.POST)
     public ResponseEntity<ImprovePhotoJbDto> improvePhotoJbID(@RequestBody ImprovePhotoJbDto improvePhotoJbDto) {
-        String photoFile = improvePhotoJbDto.getPhotoFile();
-        ImprovePhotoJbDto res = mediaQualityService.enqueuePhoto(photoFile);
+        UUID userId = improvePhotoJbDto.getUserId();
+        UUID photoId = improvePhotoJbDto.getPhotoId();
+        JobType jobType = improvePhotoJbDto.getJobType();
+        ImprovePhotoJbDto res = mediaQualityService.enqueuePhoto(userId, photoId, jobType);
         if (res == null) {
-            logger.warn("No improvement found for photo with ID: {}", improvePhotoJbDto.getImprovePhotoJbId());
+            logger.warn("No improvement found for photo with ID: {}", improvePhotoJbDto.getJobId());
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(ImprovePhotoJbDto.builder()
-                .improvePhotoJbId(res.getImprovePhotoJbId())
-                .photoFile(res.getPhotoFile())
+                .photoId(res.getPhotoId())
+                .userId(res.getUserId())
+                .jobId(res.getJobId())
+                .jobType(res.getJobType())
+                .jobSubmissionTime(res.getJobSubmissionTime())
                 .build());
     }
 
-    @RequestMapping(value = "/results/{improvedPhotoId}", method = RequestMethod.GET)
-    public ResponseEntity<ImprovedPhotoResultDto> getImprovedPhoto(@PathVariable String improvedPhotoId) {
-        ImprovedPhotoResultDto res = mediaQualityService.getImprovedPhoto(improvedPhotoId);
+    @RequestMapping(value = "/results/{jobId}", method = RequestMethod.GET)
+    public ResponseEntity<ImprovedPhotoResultDto> getImprovedPhoto(@PathVariable UUID jobId) {
+        ImprovedPhotoResultDto res = mediaQualityService.getImprovedPhoto(jobId);
 
         if (res == null) {
             return ResponseEntity.notFound().build();
         }
 
         return ResponseEntity.ok(ImprovedPhotoResultDto.builder()
-                .improvedPhotoUrl(res.getImprovedPhotoUrl())
+                .resultId(res.getResultId())
+                .userId(res.getUserId())
+                .jobId(res.getJobId())
+                .s3Key(res.getS3Key())
+                .generatedTime(res.getGeneratedTime())
                 .build());
     }
 }

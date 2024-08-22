@@ -1,40 +1,65 @@
 package org.abx.virturalpet.service;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Optional;
+import org.abx.virturalpet.dto.ImmutablePetServiceDto;
 import org.abx.virturalpet.dto.PetServiceDto;
+import org.abx.virturalpet.dto.PetTypeEnum;
+import org.abx.virturalpet.model.PetDoc;
+import org.abx.virturalpet.repository.PetDocRepository;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PetService {
-    private static final Map<Integer, PetServiceDto> pets = new HashMap<>();
 
-    public PetServiceDto updatePet(int petID, PetServiceDto petServiceDto) {
-        PetServiceDto pet = pets.get(petID);
-        if (pet == null) {
-            return null;
-        }
-        PetServiceDto updatedPet = PetServiceDto.builder()
-                .from(pet)
-                .petAge(petServiceDto.getPetAge())
-                .petName(petServiceDto.getPetName())
-                .petType(petServiceDto.getPetType())
-                .build();
+    private final PetDocRepository petDocRepository;
 
-        pets.put(petID, updatedPet);
-        return updatedPet;
+    public PetService(PetDocRepository petDocRepository) {
+        this.petDocRepository = petDocRepository;
     }
 
     public PetServiceDto searchPetByID(int id) {
-        return pets.get(id);
+        Optional<PetDoc> petDocOptional = petDocRepository.findById((long) id);
+        return petDocOptional.map(this::mapToDto).orElse(null);
+    }
+
+    public PetServiceDto updatePet(int petID, PetServiceDto petServiceDto) {
+        Optional<PetDoc> petDocOptional = petDocRepository.findById((long) petID);
+        if (petDocOptional.isPresent()) {
+            PetDoc petDoc = petDocOptional.get();
+            petDoc.setPetName(petServiceDto.getPetName());
+            petDoc.setPetType(petServiceDto.getPetType().name());
+            petDoc.setPetAge(petServiceDto.getPetAge());
+            petDoc = petDocRepository.save(petDoc);
+            return mapToDto(petDoc);
+        }
+        return null;
     }
 
     public boolean deletePetByID(Integer petId) {
-        return pets.remove(petId) != null;
+        if (petDocRepository.existsById((long) petId)) {
+            petDocRepository.deleteById((long) petId);
+            return true;
+        }
+        return false;
     }
 
     public PetServiceDto createPet(PetServiceDto petServiceDto) {
-        pets.put(petServiceDto.getPetId(), petServiceDto);
-        return petServiceDto;
+        PetDoc petDoc = new PetDoc();
+        petDoc.setPetName(petServiceDto.getPetName());
+        petDoc.setPetType(petServiceDto.getPetType().name());
+        petDoc.setPetAge(petServiceDto.getPetAge());
+        petDoc = petDocRepository.save(petDoc);
+        return mapToDto(petDoc);
+    }
+
+    // convert type PetDoc to PetServiceDto
+    // to connect model/repo and dto
+    private PetServiceDto mapToDto(PetDoc petDoc) {
+        return ImmutablePetServiceDto.builder()
+                .petId(petDoc.getPetId().intValue())
+                .petName(petDoc.getPetName())
+                .petType(PetTypeEnum.valueOf(petDoc.getPetType()))
+                .petAge(petDoc.getPetAge())
+                .build();
     }
 }

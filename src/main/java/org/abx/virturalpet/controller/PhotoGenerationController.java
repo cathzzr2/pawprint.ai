@@ -2,7 +2,6 @@ package org.abx.virturalpet.controller;
 
 import org.abx.virturalpet.dto.PhotoGenerationDto;
 import org.abx.virturalpet.service.PhotoGenerationService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,18 +12,26 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class PhotoGenerationController {
 
-    @Autowired
-    private PhotoGenerationService photoGenerationService;
+    private final PhotoGenerationService photoGenerationService;
+
+    public PhotoGenerationController(PhotoGenerationService photoGenerationService) {
+        this.photoGenerationService = photoGenerationService;
+    }
 
     @RequestMapping(value = "/generate-img", method = RequestMethod.POST)
     public ResponseEntity<PhotoGenerationDto> generateImg(@RequestBody PhotoGenerationDto photoGenerationDto) {
-        PhotoGenerationDto imgGen = photoGenerationService.generateImg(photoGenerationDto.getImageData());
+        PhotoGenerationDto imgGen = photoGenerationService.generateImg(
+                photoGenerationDto.getImageData(), photoGenerationDto.getUserId(), photoGenerationDto.getJobType());
         if (imgGen == null) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(PhotoGenerationDto.builder()
                 .imageData(imgGen.getImageData())
+                .imageId(imgGen.getImageId())
                 .jobId(imgGen.getJobId())
+                .userId(imgGen.getUserId())
+                .jobType(imgGen.getJobType())
+                .status(imgGen.getStatus())
                 .build());
     }
 
@@ -37,7 +44,7 @@ public class PhotoGenerationController {
         }
 
         return ResponseEntity.ok(
-                PhotoGenerationDto.builder().completed(imgGen.getCompleted()).build());
+                PhotoGenerationDto.builder().status(imgGen.getStatus()).build());
     }
 
     @RequestMapping(value = "/generate-img/get/{imgId}", method = RequestMethod.GET)
