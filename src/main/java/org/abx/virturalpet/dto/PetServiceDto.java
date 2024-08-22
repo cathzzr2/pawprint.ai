@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.io.Serializable;
+import java.util.UUID;
 import org.immutables.value.Value;
 
 @Value.Immutable
@@ -13,8 +14,8 @@ public interface PetServiceDto extends Serializable {
 
     @Value.Default
     @JsonProperty("pet_id")
-    default int getPetId() {
-        return 0;
+    default UUID getPetId() {
+        return UUID.randomUUID();
     }
 
     @JsonProperty("pet_name")

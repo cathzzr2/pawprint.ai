@@ -2,6 +2,7 @@ package org.abx.virturalpet.controller;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.UUID;
 import org.abx.virturalpet.dto.ImmutablePetServiceDto;
 import org.abx.virturalpet.dto.PetServiceDto;
 import org.abx.virturalpet.service.PetService;
@@ -22,7 +23,7 @@ public class PetServiceController {
     }
 
     @RequestMapping(value = "/pets/{pet_id}", method = RequestMethod.GET)
-    public ResponseEntity<PetServiceDto> getPetDocument(@PathVariable("pet_id") int petId) {
+    public ResponseEntity<PetServiceDto> getPetDocument(@PathVariable("pet_id") UUID petId) {
         PetServiceDto petServiceDto = petService.searchPetByID(petId);
 
         if (petServiceDto == null) {
@@ -34,7 +35,7 @@ public class PetServiceController {
 
     @RequestMapping(value = "/pets/{pet_id}", method = RequestMethod.PUT)
     public ResponseEntity<PetServiceDto> updatePetDocument(
-            @PathVariable("pet_id") int petId, @RequestBody ImmutablePetServiceDto petServiceDto) {
+            @PathVariable("pet_id") UUID petId, @RequestBody ImmutablePetServiceDto petServiceDto) {
         PetServiceDto updatedPet = petService.updatePet(petId, petServiceDto);
 
         if (updatedPet == null) {
@@ -44,7 +45,7 @@ public class PetServiceController {
     }
 
     @RequestMapping(value = "/pets/{pet_id}", method = RequestMethod.DELETE)
-    public ResponseEntity<PetServiceDto> deletePetDocument(@PathVariable("pet_id") Integer petId) {
+    public ResponseEntity<PetServiceDto> deletePetDocument(@PathVariable("pet_id") UUID petId) {
 
         if (petService.deletePetByID(petId)) {
             return ResponseEntity.noContent().build();

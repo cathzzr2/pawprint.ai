@@ -2,6 +2,7 @@ package org.abx.virturalpet.controller;
 
 import static org.mockito.Mockito.when;
 
+import java.util.UUID;
 import org.abx.virturalpet.dto.ImmutablePetServiceDto;
 import org.abx.virturalpet.dto.PetServiceDto;
 import org.abx.virturalpet.dto.PetTypeEnum;
@@ -24,29 +25,31 @@ public class PetServiceControllerTest {
     @MockBean
     private PetService petService;
 
+    private UUID samplePetId = UUID.randomUUID();
+
     @Test
     public void testGetPetDocument_returnOk() throws Exception {
         PetServiceDto mockedPetServiceDto = PetServiceDto.builder()
-                .petId(1)
+                .petId(samplePetId)
                 .petName("Alice")
                 .petType(PetTypeEnum.CAT)
                 .petAge(3)
                 .build();
 
-        when(petService.searchPetByID(1)).thenReturn(mockedPetServiceDto);
+        when(petService.searchPetByID(samplePetId)).thenReturn(mockedPetServiceDto);
 
         String requestJsonPayload = "{\n"
-                + "\"pet_id\": 1,\n"
+                + "\"pet_id\": \"" + samplePetId.toString() + "\",\n"
                 + "\"pet_name\": \"Alice\",\n"
                 + "\"pet_type\": \"CAT\",\n"
                 + "\"pet_age\": 3\n"
                 + "}";
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/pets/1")
+        mockMvc.perform(MockMvcRequestBuilders.get("/pets/{petId}", samplePetId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJsonPayload))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.pet_id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.pet_id").value(samplePetId.toString()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pet_name").value("Alice"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pet_type").value("CAT"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pet_age").value(3));
@@ -55,13 +58,13 @@ public class PetServiceControllerTest {
     @Test
     public void testGetPetDocument_returnNotFound() throws Exception {
         String requestJsonPayload = "{\n"
-                + "\"pet_id\": 1,\n"
+                + "\"pet_id\": \"" + samplePetId.toString() + "\",\n"
                 + "\"pet_name\": \"Alice\",\n"
                 + "\"pet_type\": \"CAT\",\n"
                 + "\"pet_age\": 3\n"
                 + "}";
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/pets/1")
+        mockMvc.perform(MockMvcRequestBuilders.get("/pets/{petId}", samplePetId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJsonPayload))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
@@ -70,27 +73,27 @@ public class PetServiceControllerTest {
     @Test
     public void testUpdatePetDocument_returnOk() throws Exception {
         ImmutablePetServiceDto mockedPetServiceDto = PetServiceDto.builder()
-                .petId(1)
+                .petId(samplePetId)
                 .petName("Alice")
                 .petType(PetTypeEnum.CAT)
                 .petAge(3)
                 .build();
 
-        when(petService.updatePet(org.mockito.ArgumentMatchers.eq(1), org.mockito.ArgumentMatchers.any()))
+        when(petService.updatePet(org.mockito.ArgumentMatchers.eq(samplePetId), org.mockito.ArgumentMatchers.any()))
                 .thenReturn(mockedPetServiceDto);
 
         String requestJsonPayload = "{\n"
-                + "\"pet_id\": 1,\n"
+                + "\"pet_id\": \"" + samplePetId.toString() + "\",\n"
                 + "\"pet_name\": \"Alice\",\n"
                 + "\"pet_type\": \"CAT\",\n"
                 + "\"pet_age\": 3\n"
                 + "}";
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/pets/1")
+        mockMvc.perform(MockMvcRequestBuilders.put("/pets/{petId}", samplePetId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJsonPayload))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.pet_id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.pet_id").value(samplePetId.toString()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pet_name").value("Alice"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pet_type").value("CAT"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pet_age").value(3));
@@ -100,13 +103,13 @@ public class PetServiceControllerTest {
     public void testUpdatePetDocument_returnNotFound() throws Exception {
 
         String requestJsonPayload = "{\n"
-                + "\"pet_id\": 1,\n"
+                + "\"pet_id\": \"" + samplePetId.toString() + "\",\n"
                 + "\"pet_name\": \"Alice\",\n"
                 + "\"pet_type\": \"CAT\",\n"
                 + "\"pet_age\": 3\n"
                 + "}";
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/pets/1")
+        mockMvc.perform(MockMvcRequestBuilders.put("/pets/{petId}", samplePetId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJsonPayload))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
@@ -115,15 +118,15 @@ public class PetServiceControllerTest {
     @Test
     public void testDeletePetDocument() throws Exception {
         PetServiceDto mockedPetServiceDto = PetServiceDto.builder()
-                .petId(1)
+                .petId(samplePetId)
                 .petName("Alice")
                 .petType(PetTypeEnum.CAT)
                 .petAge(3)
                 .build();
 
-        when(petService.deletePetByID(1)).thenReturn(true);
+        when(petService.deletePetByID(samplePetId)).thenReturn(true);
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/pets/1")
+        mockMvc.perform(MockMvcRequestBuilders.delete("/pets/{petId}", samplePetId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mockedPetServiceDto.toString()))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
@@ -132,15 +135,15 @@ public class PetServiceControllerTest {
     @Test
     public void testDeletePetDocument_returnNotFound() throws Exception {
         PetServiceDto mockedPetServiceDto = PetServiceDto.builder()
-                .petId(1)
+                .petId(samplePetId)
                 .petName("Alice")
                 .petType(PetTypeEnum.CAT)
                 .petAge(3)
                 .build();
 
-        when(petService.deletePetByID(1)).thenReturn(false);
+        when(petService.deletePetByID(samplePetId)).thenReturn(false);
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/pets/1")
+        mockMvc.perform(MockMvcRequestBuilders.delete("/pets/{petId}", samplePetId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mockedPetServiceDto.toString()))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
@@ -149,7 +152,7 @@ public class PetServiceControllerTest {
     @Test
     public void testCreatePetDocument() throws Exception {
         PetServiceDto mockedPetServiceDto = PetServiceDto.builder()
-                .petId(1)
+                .petId(samplePetId)
                 .petName("Alice")
                 .petType(PetTypeEnum.CAT)
                 .petAge(3)
@@ -158,7 +161,7 @@ public class PetServiceControllerTest {
         when(petService.createPet(org.mockito.ArgumentMatchers.any())).thenReturn(mockedPetServiceDto);
 
         String requestJsonPayload = "{\n"
-                + "\"pet_id\": 1,\n"
+                + "\"pet_id\": \"" + samplePetId.toString() + "\",\n"
                 + "\"pet_name\": \"Alice\",\n"
                 + "\"pet_type\": \"CAT\",\n"
                 + "\"pet_age\": 3\n"
@@ -168,11 +171,11 @@ public class PetServiceControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJsonPayload))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.pet_id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.pet_id").value(samplePetId.toString()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pet_name").value("Alice"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pet_type").value("CAT"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pet_age").value(3))
-                .andExpect(MockMvcResultMatchers.header().string("Location", "/pets/1"));
+                .andExpect(MockMvcResultMatchers.header().string("Location", "/pets/" + samplePetId));
     }
 
     @Test
@@ -181,7 +184,7 @@ public class PetServiceControllerTest {
         when(petService.createPet(org.mockito.ArgumentMatchers.any())).thenReturn(null);
 
         String requestJsonPayload = "{\n"
-                + "\"pet_id\": 1,\n"
+                + "\"pet_id\": \"" + samplePetId.toString() + "\",\n"
                 + "\"pet_name\": \"Alice\",\n"
                 + "\"pet_type\": \"CAT\",\n"
                 + "\"pet_age\": 3\n"

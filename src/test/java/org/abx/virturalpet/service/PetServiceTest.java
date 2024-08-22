@@ -1,6 +1,7 @@
 package org.abx.virturalpet.service;
 
 import java.util.Optional;
+import java.util.UUID;
 import org.abx.virturalpet.dto.ImmutablePetServiceDto;
 import org.abx.virturalpet.dto.PetServiceDto;
 import org.abx.virturalpet.dto.PetTypeEnum;
@@ -22,6 +23,8 @@ public class PetServiceTest {
     @InjectMocks
     private PetService petService;
 
+    private UUID samplePetId = UUID.randomUUID();
+
     @BeforeEach
     public void beforeEach() {
         MockitoAnnotations.openMocks(this);
@@ -29,18 +32,19 @@ public class PetServiceTest {
 
     @Test
     public void testSearchPetByID() {
+
         PetDoc petDoc = new PetDoc.Builder()
-                .setPetId(1L) // cast from int to long
+                .setPetId(samplePetId) // cast from int to long
                 .setPetName("Rover")
                 .setPetType("DOG")
                 .setPetAge(5)
                 .build();
-        Mockito.when(petDocRepository.findById(1L)).thenReturn(Optional.of(petDoc));
+        Mockito.when(petDocRepository.findById(samplePetId)).thenReturn(Optional.of(petDoc));
 
-        PetServiceDto petServiceDto = petService.searchPetByID(1);
+        PetServiceDto petServiceDto = petService.searchPetByID(samplePetId);
 
         Assertions.assertNotNull(petServiceDto);
-        Assertions.assertEquals(1, petServiceDto.getPetId());
+        Assertions.assertEquals(samplePetId, petServiceDto.getPetId());
         Assertions.assertEquals("Rover", petServiceDto.getPetName());
         Assertions.assertEquals(PetTypeEnum.DOG, petServiceDto.getPetType());
         Assertions.assertEquals(5, petServiceDto.getPetAge());
@@ -48,9 +52,9 @@ public class PetServiceTest {
 
     @Test
     public void testSearchPetByIdNotFound() {
-        Mockito.when(petDocRepository.findById(1L)).thenReturn(Optional.empty());
+        Mockito.when(petDocRepository.findById(samplePetId)).thenReturn(Optional.empty());
 
-        PetServiceDto petServiceDto = petService.searchPetByID(1);
+        PetServiceDto petServiceDto = petService.searchPetByID(samplePetId);
 
         Assertions.assertNull(petServiceDto);
     }
@@ -64,7 +68,7 @@ public class PetServiceTest {
                 .build();
 
         PetDoc petDoc = new PetDoc.Builder()
-                .setPetId(1L)
+                .setPetId(samplePetId)
                 .setPetName("Rover")
                 .setPetType("DOG")
                 .setPetAge(1)
@@ -76,7 +80,7 @@ public class PetServiceTest {
         PetServiceDto createdPetServiceDto = petService.createPet(petServiceDto);
 
         Assertions.assertNotNull(createdPetServiceDto);
-        Assertions.assertEquals(1, createdPetServiceDto.getPetId());
+        Assertions.assertEquals(samplePetId, createdPetServiceDto.getPetId());
         Assertions.assertEquals("Rover", createdPetServiceDto.getPetName());
         Assertions.assertEquals(PetTypeEnum.DOG, createdPetServiceDto.getPetType());
         Assertions.assertEquals(1, createdPetServiceDto.getPetAge());
@@ -85,26 +89,26 @@ public class PetServiceTest {
     @Test
     public void testUpdatePet() {
         PetDoc petDoc = new PetDoc.Builder()
-                .setPetId(1L)
+                .setPetId(samplePetId)
                 .setPetName("Buddy")
                 .setPetType("DOG")
                 .setPetAge(5)
                 .build();
 
-        Mockito.when(petDocRepository.findById(1L)).thenReturn(Optional.of(petDoc));
+        Mockito.when(petDocRepository.findById(samplePetId)).thenReturn(Optional.of(petDoc));
         Mockito.when(petDocRepository.save(petDoc)).thenReturn(petDoc);
 
         PetServiceDto petServiceDto = ImmutablePetServiceDto.builder()
-                .petId(1)
+                .petId(samplePetId)
                 .petName("Buddy Updated")
                 .petType(PetTypeEnum.DOG)
                 .petAge(6)
                 .build();
 
-        PetServiceDto updatedPet = petService.updatePet(1, petServiceDto);
+        PetServiceDto updatedPet = petService.updatePet(samplePetId, petServiceDto);
 
         Assertions.assertNotNull(updatedPet);
-        Assertions.assertEquals(1, updatedPet.getPetId());
+        Assertions.assertEquals(samplePetId, updatedPet.getPetId());
         Assertions.assertEquals("Buddy Updated", updatedPet.getPetName());
         Assertions.assertEquals(PetTypeEnum.DOG, updatedPet.getPetType());
         Assertions.assertEquals(6, updatedPet.getPetAge());
@@ -112,34 +116,34 @@ public class PetServiceTest {
 
     @Test
     public void testUpdatePet_NotFound() {
-        Mockito.when(petDocRepository.findById(1L)).thenReturn(Optional.empty());
+        Mockito.when(petDocRepository.findById(samplePetId)).thenReturn(Optional.empty());
 
         PetServiceDto petServiceDto = ImmutablePetServiceDto.builder()
-                .petId(1)
+                .petId(samplePetId)
                 .petName("Buddy Updated")
                 .petType(PetTypeEnum.DOG)
                 .petAge(6)
                 .build();
 
-        PetServiceDto updatedPet = petService.updatePet(1, petServiceDto);
+        PetServiceDto updatedPet = petService.updatePet(samplePetId, petServiceDto);
 
         Assertions.assertNull(updatedPet);
     }
 
     @Test
     public void testDeletePetByID() {
-        Mockito.when(petDocRepository.existsById(1L)).thenReturn(true);
+        Mockito.when(petDocRepository.existsById(samplePetId)).thenReturn(true);
 
-        boolean deleted = petService.deletePetByID(1);
+        boolean deleted = petService.deletePetByID(samplePetId);
 
         Assertions.assertTrue(deleted);
     }
 
     @Test
     public void testDeletePetByID_NotFound() {
-        Mockito.when(petDocRepository.existsById(1L)).thenReturn(false);
+        Mockito.when(petDocRepository.existsById(samplePetId)).thenReturn(false);
 
-        boolean deleted = petService.deletePetByID(1);
+        boolean deleted = petService.deletePetByID(samplePetId);
 
         Assertions.assertFalse(deleted);
     }

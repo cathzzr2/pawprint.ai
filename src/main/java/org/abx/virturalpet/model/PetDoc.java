@@ -67,7 +67,9 @@ public class PetDoc {
         return petId;
     }
 
-    public void setPetId(UUID petId) { 
+    public void setPetId(UUID petId) {
+        this.petId = petId;
+    }
 
     public String getPetName() {
         return petName;
