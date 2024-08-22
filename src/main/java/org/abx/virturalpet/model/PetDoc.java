@@ -15,7 +15,7 @@ public class PetDoc {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pet_id", updatable = false, nullable = false)
     private UUID petId; // schema uses SERIAL type here
-  
+
     @Column(name = "pet_name", length = 50, nullable = false)
     private String petName;
 
