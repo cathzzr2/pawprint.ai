@@ -17,7 +17,7 @@ public class SqsClientConfig {
         // "http://localhost:4566/000000000000/virtual-pet-queue"
 
         return SqsClient.builder()
-                .endpointOverride(URI.create("http://localhost:4566"))
+                .endpointOverride(URI.create("http://localhost:4566/"))
                 .credentialsProvider(StaticCredentialsProvider.create(
                         AwsBasicCredentials.create("fakeMyKeyId", "fakeSecretAccessKey")))
                 .region(Region.US_EAST_1)
