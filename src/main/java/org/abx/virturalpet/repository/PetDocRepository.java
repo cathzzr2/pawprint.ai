@@ -6,21 +6,21 @@ import java.util.UUID;
 import org.abx.virturalpet.model.PetDoc;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface PetDocRepository extends JpaRepository<PetDoc, Long> {
-    // make it optional
-    Optional<List<PetDoc>> findByPetName(String name);
+public interface PetDocRepository extends JpaRepository<PetDoc, UUID> {
 
-    Optional<List<PetDoc>> findByPetType(String type);
+    Optional<List<PetDoc>> findByPetName(String petName);
 
-    Optional<List<PetDoc>> findByPetBreed(String breed);
+    Optional<List<PetDoc>> findByPetType(String petType);
 
-    Optional<List<PetDoc>> findByPetAge(int age);
+    Optional<List<PetDoc>> findByPetBreed(String petBreed);
 
-    Optional<List<PetDoc>> findByPetBirthdate(java.sql.Date birthdate);
+    Optional<List<PetDoc>> findByPetAge(int petAge);
 
-    Optional<List<PetDoc>> findByPetGender(String gender);
+    Optional<List<PetDoc>> findByPetBirthdate(java.sql.Date petBirthdate);
 
-    Optional<List<PetDoc>> findByPetColor(String color);
+    Optional<List<PetDoc>> findByPetGender(String petGender);
+
+    Optional<List<PetDoc>> findByPetColor(String petColor);
 
     Optional<List<PetDoc>> findByOwnerId(UUID ownerId);
 }

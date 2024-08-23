@@ -1,6 +1,7 @@
 package org.abx.virturalpet.service;
 
 import java.util.Optional;
+import java.util.UUID;
 import org.abx.virturalpet.dto.ImmutablePetServiceDto;
 import org.abx.virturalpet.dto.PetServiceDto;
 import org.abx.virturalpet.dto.PetTypeEnum;
@@ -17,13 +18,13 @@ public class PetService {
         this.petDocRepository = petDocRepository;
     }
 
-    public PetServiceDto searchPetByID(int id) {
-        Optional<PetDoc> petDocOptional = petDocRepository.findById((long) id);
+    public PetServiceDto searchPetByID(UUID petId) {
+        Optional<PetDoc> petDocOptional = petDocRepository.findById(petId);
         return petDocOptional.map(this::mapToDto).orElse(null);
     }
 
-    public PetServiceDto updatePet(int petID, PetServiceDto petServiceDto) {
-        Optional<PetDoc> petDocOptional = petDocRepository.findById((long) petID);
+    public PetServiceDto updatePet(UUID petId, PetServiceDto petServiceDto) {
+        Optional<PetDoc> petDocOptional = petDocRepository.findById(petId);
         if (petDocOptional.isPresent()) {
             PetDoc petDoc = petDocOptional.get();
             petDoc.setPetName(petServiceDto.getPetName());
@@ -35,9 +36,9 @@ public class PetService {
         return null;
     }
 
-    public boolean deletePetByID(Integer petId) {
-        if (petDocRepository.existsById((long) petId)) {
-            petDocRepository.deleteById((long) petId);
+    public boolean deletePetByID(UUID petId) {
+        if (petDocRepository.existsById(petId)) {
+            petDocRepository.deleteById(petId);
             return true;
         }
         return false;
@@ -56,7 +57,7 @@ public class PetService {
     // to connect model/repo and dto
     private PetServiceDto mapToDto(PetDoc petDoc) {
         return ImmutablePetServiceDto.builder()
-                .petId(petDoc.getPetId().intValue())
+                .petId(petDoc.getPetId())
                 .petName(petDoc.getPetName())
                 .petType(PetTypeEnum.valueOf(petDoc.getPetType()))
                 .petAge(petDoc.getPetAge())

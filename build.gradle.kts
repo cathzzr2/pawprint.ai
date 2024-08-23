@@ -69,6 +69,12 @@ dependencies {
     testImplementation("com.adobe.testing:s3mock-testcontainers:3.3.0")
     testImplementation("org.testcontainers:junit-jupiter:1.19.0")
 
+    // S3Mock
+    testImplementation("software.amazon.awssdk:url-connection-client:2.17+")
+    testImplementation("com.adobe.testing:s3mock:3.3.0")
+    testImplementation("com.adobe.testing:s3mock-testcontainers:3.3.0")
+    testImplementation("org.testcontainers:junit-jupiter:1.19.0")
+
 
     annotationProcessor("org.immutables:value:2.9.3")
     compileOnly("org.immutables:value:2.9.3")
@@ -84,8 +90,6 @@ dependencies {
     testImplementation("software.amazon.awssdk:url-connection-client:2.17+")
     testImplementation("com.adobe.testing:s3mock:3.3.0")
     testImplementation("com.adobe.testing:s3mock-testcontainers:3.3.0")
-    testImplementation("org.testcontainers:junit-jupiter:1.19.0")
-
     testImplementation("org.testcontainers:junit-jupiter:1.19.0")
     testImplementation("org.testcontainers:postgresql:1.20.0")
 

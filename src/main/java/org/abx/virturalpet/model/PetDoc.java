@@ -14,7 +14,7 @@ public class PetDoc {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pet_id", updatable = false, nullable = false)
-    private Long petId; // schema uses SERIAL type here
+    private UUID petId; // schema uses SERIAL type here
 
     @Column(name = "pet_name", length = 50, nullable = false)
     private String petName;
@@ -28,7 +28,7 @@ public class PetDoc {
     @Column(name = "pet_age", length = 50, nullable = false)
     private int petAge; // schema used SMALLINT type here
 
-    @Column(name = "pet_birthday", nullable = false)
+    @Column(name = "pet_birthdate", nullable = false)
     private java.sql.Date petBirthdate;
 
     @Column(name = "pet_gender", length = 10, nullable = false)
@@ -43,7 +43,7 @@ public class PetDoc {
     public PetDoc() {}
 
     public PetDoc(
-            Long petId,
+            UUID petId,
             String petName,
             String petType,
             String petBreed,
@@ -63,11 +63,11 @@ public class PetDoc {
         this.ownerId = ownerId;
     }
 
-    public Long getPetId() {
+    public UUID getPetId() {
         return petId;
     }
 
-    public void setPetId(Long petId) {
+    public void setPetId(UUID petId) {
         this.petId = petId;
     }
 
@@ -150,7 +150,7 @@ public class PetDoc {
     }
 
     public static class Builder {
-        private Long petId;
+        private UUID petId;
         private String petName;
         private String petType;
         private String petBreed;
@@ -160,7 +160,7 @@ public class PetDoc {
         private String petColor;
         private UUID ownerId;
 
-        public Builder setPetId(Long petId) {
+        public Builder setPetId(UUID petId) {
             this.petId = petId;
             return this;
         }
